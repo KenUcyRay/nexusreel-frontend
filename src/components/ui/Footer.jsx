@@ -54,7 +54,7 @@ export default function Footer() {
                 <img src={logo} alt="Logo" className="w-8 h-8" />
                 <div>
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
-                    Nexus Reel
+                    NexusVerse
                   </h3>
                   <p className="text-xs text-gray-400">Your Premium Movie Experience</p>
                 </div>
@@ -123,7 +123,7 @@ export default function Footer() {
           <div className="pt-6 mt-6 border-t border-gray-700/50">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
               <p className="text-sm text-gray-400">
-                © {currentYear} Nexus Reel. All rights reserved.
+                © {currentYear} NexusVerse. All rights reserved.
               </p>
               
               <div className="flex items-center space-x-4 text-sm">

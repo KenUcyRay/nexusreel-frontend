@@ -29,15 +29,15 @@ export default function Navbar() {
         }`}>
           <div className="flex items-center space-x-2">
             <img src={logo} alt="Logo" className="w-8 h-8" />
-            <span className="text-2xl font-bold text-black">Nexus Reel</span>
+            <span className="text-2xl font-bold text-black">NexusVerse</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <a href="/" className="flex items-center space-x-2 text-[#FFA500] hover:bg-gradient-to-r hover:from-[#FFD700] hover:to-[#FFA500] hover:bg-clip-text hover:text-transparent transition-all font-medium py-2 border-b-2 border-transparent hover:border-[#FFA500]">
+            <a href="/" className="flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium py-2 border-b-2 border-transparent hover:border-gray-700" style={{color: 'black !important'}}>
               <img src={homeIcon} alt="Home" className="w-10 h-10" />
               <span>Home</span>
             </a>
-            <a href="/about" className="flex items-center space-x-2 text-[#FFA500] hover:bg-gradient-to-r hover:from-[#FFD700] hover:to-[#FFA500] hover:bg-clip-text hover:text-transparent transition-all font-medium py-2 border-b-2 border-transparent hover:border-[#FFA500]">
+            <a href="/about" className="flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium py-2 border-b-2 border-transparent hover:border-gray-700" style={{color: 'black !important'}}>
               <img src={aboutIcon} alt="About" className="w-10 h-10" />
               <span>About</span>
             </a>
@@ -75,7 +75,7 @@ export default function Navbar() {
             isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}>
             <img src={logo} alt="Logo" className="w-7 h-7" />
-            <span className="text-lg font-bold text-[#FFA500]">Nexus Reel</span>
+            <span className="text-lg font-bold text-[#FFA500]">NexusVerse</span>
           </div>
 
           {/* Center menu - card style */}
@@ -86,9 +86,10 @@ export default function Navbar() {
           }`}>
             <a 
               href="/movies" 
-              className={`flex items-center space-x-2 text-[#FFA500] hover:bg-gradient-to-r hover:from-[#FFD700] hover:to-[#FFA500] hover:bg-clip-text hover:text-transparent transition-all font-medium ${
+              style={{color: 'black !important'}}
+              className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
                 isScrolled 
-                  ? 'py-2 border-b-2 border-[#FFA500]' 
+                  ? 'py-2 border-b-2 border-gray-700' 
                   : 'py-4 px-6 border-r border-gray-200'
               }`}
             >
@@ -100,9 +101,10 @@ export default function Navbar() {
             </a>
             <a 
               href="/cinemas" 
-              className={`flex items-center space-x-2 text-[#FFA500] hover:bg-gradient-to-r hover:from-[#FFD700] hover:to-[#FFA500] hover:bg-clip-text hover:text-transparent transition-all font-medium ${
+              style={{color: 'black !important'}}
+              className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
                 isScrolled 
-                  ? 'py-2 border-b-2 border-transparent hover:border-[#FFA500]' 
+                  ? 'py-2 border-b-2 border-transparent hover:border-gray-700' 
                   : 'py-4 px-6 border-r border-gray-200'
               }`}
             >
@@ -114,9 +116,10 @@ export default function Navbar() {
             </a>
             <a 
               href="/booking" 
-              className={`flex items-center space-x-2 text-[#FFA500] hover:bg-gradient-to-r hover:from-[#FFD700] hover:to-[#FFA500] hover:bg-clip-text hover:text-transparent transition-all font-medium ${
+              style={{color: 'black !important'}}
+              className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
                 isScrolled 
-                  ? 'py-2 border-b-2 border-transparent hover:border-[#FFA500]' 
+                  ? 'py-2 border-b-2 border-transparent hover:border-gray-700' 
                   : 'py-4 px-6'
               }`}
             >

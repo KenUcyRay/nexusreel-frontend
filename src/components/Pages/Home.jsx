@@ -1,106 +1,122 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Footer from "../ui/Footer";
 import Navbar from "../ui/navbar";
+import banner1 from '../../assets/banner1.webp';
+import banner2 from '../../assets/banner2.jpg';
+import banner3 from '../../assets/banner3.jpeg';
+import banner4 from '../../assets/banner4.jpg';
+import cm1 from '../../assets/cm1.jpg';
+import cm2 from '../../assets/cm2.jpg';
+import cm3 from '../../assets/cm3.webp';
+import cm4 from '../../assets/cm4.jpeg';
+import live1 from '../../assets/live1.webp';
+import live2 from '../../assets/live2.jpg';
+import live3 from '../../assets/live3.jpg';
+import live4 from '../../assets/live4.webp';
 
 // Mock data for movies
 const nowPlayingMovies = [
   {
     id: 1,
-    title: "Spiderman: No Way Home",
-    genre: "Action, Adventure",
-    rating: 8.5,
-    duration: "148 min",
-    poster: "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&h=400&fit=crop"
+    title: "(G)I-DLE World Tour [iDOL] IN CINEMAS",
+    genre: "Music, Documentary",
+    rating: 9.0,
+    duration: "120 min",
+    poster: live1
   },
   {
     id: 2,
-    title: "The Batman",
-    genre: "Action, Crime",
-    rating: 8.2,
-    duration: "176 min",
-    poster: "https://images.unsplash.com/photo-1509347528160-9329d33b2588?w=300&h=400&fit=crop"
+    title: "Omniscient Reader: The Prophecy",
+    genre: "Action, Fantasy, Thriller",
+    rating: 8.6,
+    duration: "137 min",
+    poster: live2
   },
   {
     id: 3,
-    title: "Top Gun: Maverick",
-    genre: "Action, Drama",
-    rating: 8.7,
-    duration: "130 min",
-    poster: "https://images.unsplash.com/photo-1489599663989-1bb2b8b91ed5?w=300&h=400&fit=crop"
+    title: "I, the Executioner",
+    genre: "Crime, Thriller, Mystery",
+    rating: 8.1,
+    duration: "141 min",
+    poster: live3
   },
   {
     id: 4,
-    title: "Doctor Strange 2",
-    genre: "Action, Fantasy",
-    rating: 7.8,
-    duration: "126 min",
-    poster: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop"
+    title: "Jumbo",
+    genre: "Animation, Adventure, Family",
+    rating: 7.9,
+    duration: "105 min",
+    poster: live4
   }
 ];
 
 const comingSoonMovies = [
   {
     id: 5,
-    title: "Avatar: The Way of Water",
-    genre: "Adventure, Sci-Fi",
+    title: "Kimetsu no Yaiba: Infinite Castle",
+    genre: "Action, Fantasy, Adventure",
     releaseDate: "16 Dec 2024",
     duration: "192 min",
-    poster: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=400&fit=crop"
+    poster: cm1
   },
   {
     id: 6,
-    title: "Black Panther 2",
-    genre: "Action, Adventure",
+    title: "One Piece Film: Red",
+    genre: "Adventure, Fantasy, Music",
     releaseDate: "11 Nov 2024",
     duration: "161 min",
-    poster: "https://images.unsplash.com/photo-1594736797933-d0d6a7d80a68?w=300&h=400&fit=crop"
+    poster: cm2
   },
   {
     id: 7,
-    title: "The Flash",
-    genre: "Action, Adventure",
+    title: "K-Pop Demon Hunter",
+    genre: "Action, Fantasy, Music",
     releaseDate: "16 Jun 2024",
     duration: "144 min",
-    poster: "https://images.unsplash.com/photo-1635863138275-d9b33299680b?w=300&h=400&fit=crop"
+    poster: cm3
   },
   {
     id: 8,
-    title: "Aquaman 2",
-    genre: "Action, Adventure",
+    title: "Suzume",
+    genre: "Adventure, Fantasy, Drama",
     releaseDate: "20 Dec 2024",
     duration: "124 min",
-    poster: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=300&h=400&fit=crop"
+    poster: cm4
   }
 ];
 
 const carouselMovies = [
   {
     id: 1,
-    title: "Avengers: Endgame",
-    description: "Setelah peristiwa menghancurkan dari Avengers: Infinity War, alam semesta dalam kehancuran. Dengan bantuan dari sekutu yang tersisa, para Avengers berkumpul sekali lagi untuk membalikkan tindakan Thanos dan memulihkan keseimbangan alam semesta.",
-    backdrop: "https://images.unsplash.com/photo-1635863138275-d9b33299680b?w=1920&h=800&fit=crop",
-    genre: "Action, Adventure, Drama"
+    title: "Demon Slayer: Infinite Castle",
+    description: "The final battle begins as Tanjiro and the Hashira infiltrate the Infinity Castle, filled with deadly traps and powerful demons, to face Muzan Kibutsuji once and for all.",
+    backdrop: banner1,
+    genre: "Action, Fantasy, Adventure"
   },
   {
     id: 2,
-    title: "Dune: Part One",
-    description: "Kisah epik tentang Paul Atreides, seorang pemuda brilian dan berbakat yang lahir untuk takdir besar di luar pemahamannya, yang harus melakukan perjalanan ke planet paling berbahaya di alam semesta.",
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=1920&h=800&fit=crop",
-    genre: "Sci-Fi, Adventure, Drama"
+    title: "One Piece Film: Red",
+    description: "Luffy and the Straw Hat crew attend the concert of world-famous diva Uta, but shocking secrets about her past and her connection to Shanks soon come to light.",
+    backdrop: banner2,
+    genre: "Adventure, Fantasy, Music"
   },
   {
     id: 3,
-    title: "The Matrix Resurrections",
-    description: "Neo hidup kehidupan yang tampaknya biasa di San Francisco di mana terapis Dr. Anderson meresepkan pil biru. Sampai Morpheus menawarkan pil merah dan membuka pikiran Neo sekali lagi.",
-    backdrop: "https://images.unsplash.com/photo-1489599663989-1bb2b8b91ed5?w=1920&h=800&fit=crop",
-    genre: "Action, Sci-Fi"
+    title: "K-Pop Demon Hunter",
+    description: "In a world where music fights darkness, a secret girl group of K-pop idols battles demons while keeping their true identities hidden from the public.",
+    backdrop: banner3,
+    genre: "Action, Fantasy, Music"
+  },
+  {
+    id: 4,
+    title: "Suzume",
+    description: "A young girl named Suzume discovers a mysterious door that brings disasters across Japan. With the help of a strange traveler, she sets out to close all the doors before chaos spreads.",
+    backdrop: banner4,
+    genre: "Adventure, Fantasy, Drama"
   }
 ];
-
-
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -161,19 +177,7 @@ export default function Home() {
           ))}
         </div>
         
-        {/* Carousel Controls */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
+
         
         {/* Carousel Indicators */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -204,7 +208,7 @@ export default function Home() {
               href="/bookings"
               className="flex items-center px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg"
             >
-              <Film className="w-6 h-6 mr-3" />
+              < BookPlus className="w-6 h-6 mr-3" />
               Bookings
             </a>
              <a
@@ -327,9 +331,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Uncomment this when you have the Footer component */}
-      {/* <Footer /> */}
     </div>
   );
 }
