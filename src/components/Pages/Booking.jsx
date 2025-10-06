@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Film } from 'lucide-react';
-import Navbar from "../ui/navbar";
+import Navbar from "../ui/MainNavbar";
 
 const movies = [
   "(G)I-DLE World Tour [iDOL] IN CINEMAS",

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
-import Navbar from "../ui/navbar";
+import Navbar from "../ui/MainNavbar";
 import live1 from '../../assets/live1.webp';
 import live2 from '../../assets/live2.jpg';
 import live3 from '../../assets/live3.jpg';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Navbar from "../ui/navbar";
+import Navbar from "../ui/MainNavbar";
 import banner1 from '../../assets/banner1.webp';
 import banner2 from '../../assets/banner2.jpg';
 import banner3 from '../../assets/banner3.jpeg';

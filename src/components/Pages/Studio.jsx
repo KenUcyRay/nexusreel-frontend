@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin, Users, Volume2, Wifi } from 'lucide-react';
-import Navbar from "../ui/navbar";
+import Navbar from "../ui/MainNavbar";
 
 const studios = [
   {
