@@ -6,12 +6,11 @@ export default function Footer() {
   const [currentYear] = useState(new Date().getFullYear());
   const [hoveredSocial, setHoveredSocial] = useState(null);
 
-
   const socialLinks = [
-    { icon: Facebook, name: 'Facebook', color: 'hover:bg-blue-600' },
-    { icon: Twitter, name: 'Twitter', color: 'hover:bg-sky-500' },
+    { icon: Facebook, name: 'Facebook', color: 'hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700' },
+    { icon: Twitter, name: 'Twitter', color: 'hover:bg-gradient-to-r hover:from-sky-400 hover:to-sky-600' },
     { icon: Instagram, name: 'Instagram', color: 'hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500' },
-    { icon: Youtube, name: 'Youtube', color: 'hover:bg-red-600' }
+    { icon: Youtube, name: 'Youtube', color: 'hover:bg-gradient-to-r hover:from-red-500 hover:to-red-700' }
   ];
 
   const quickLinks = [
