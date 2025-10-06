@@ -9,15 +9,12 @@ export default function Footer() {
   const socialLinks = [
     { icon: Facebook, name: 'Facebook', color: 'hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700' },
     { icon: Twitter, name: 'Twitter', color: 'hover:bg-gradient-to-r hover:from-sky-400 hover:to-sky-600' },
-    { icon: Instagram, name: 'Instagram', color: 'hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500' },
     { icon: Youtube, name: 'Youtube', color: 'hover:bg-gradient-to-r hover:from-red-500 hover:to-red-700' }
   ];
 
   const quickLinks = [
     'Now Showing', 'Coming Soon'
   ];
-
-
 
   return (
     <>
@@ -54,7 +51,7 @@ export default function Footer() {
             {/* Brand section */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 group cursor-pointer">
-                <img src={logo} alt="Logo" className="w-20 h-20" />
+                <img src={logo} alt="Logo" className="w-8 h-8" />
                 <div>
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
                     Nexus Reel
@@ -74,7 +71,7 @@ export default function Footer() {
                     key={index}
                     onMouseEnter={() => setHoveredSocial(index)}
                     onMouseLeave={() => setHoveredSocial(null)}
-                    className={`p-2 bg-gray-700/50 backdrop-blur-sm rounded-lg transition-all duration-300 transform hover:scale-110 ${social.color} hover:shadow-lg`}
+                    className={`p-2 bg-gray-700/50 backdrop-blur-sm rounded-lg transition-all duration-300 transform hover:scale-110 ${social.color} hover:shadow-lg hover:text-white`}
                     aria-label={social.name}
                   >
                     <social.icon className={`w-4 h-4 ${hoveredSocial === index ? 'text-white' : 'text-gray-300'}`} />
@@ -119,8 +116,6 @@ export default function Footer() {
                   <span>10:00 - 22:00 Daily</span>
                 </div>
               </div>
-
-
             </div>
           </div>
 
@@ -128,7 +123,7 @@ export default function Footer() {
           <div className="pt-6 mt-6 border-t border-gray-700/50">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
               <p className="text-sm text-gray-400">
-                © {currentYear} Nexus Cinema. All rights reserved.
+                © {currentYear} Nexus Reel. All rights reserved.
               </p>
               
               <div className="flex items-center space-x-4 text-sm">

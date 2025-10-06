@@ -129,7 +129,7 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Carousel Section */}
-      <section className="relative h-screen overflow-hidden">
+      <section className="relative h-screen overflow-hidden pt-32">
         <div className="relative h-full">
           {carouselMovies.map((movie, index) => (
             <div
@@ -194,18 +194,25 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center space-x-8" data-aos="fade-up">
             <a
-              href="/booking"
+              href="/movies"
               className="flex items-center px-8 py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg"
             >
               <Calendar className="w-6 h-6 mr-3" />
-              Booking
+              Movies
             </a>
             <a
-              href="/movies"
+              href="/bookings"
               className="flex items-center px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg"
             >
               <Film className="w-6 h-6 mr-3" />
-              Movies
+              Bookings
+            </a>
+             <a
+              href="/studios"
+              className="flex items-center px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg"
+            >
+              <Film className="w-6 h-6 mr-3" />
+              Studios
             </a>
           </div>
         </div>
