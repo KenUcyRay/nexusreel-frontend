@@ -205,7 +205,7 @@ export default function Home() {
               Movies
             </a>
             <a
-              href="/bookings"
+              href="/booking"
               className="flex items-center px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg"
             >
               < BookPlus className="w-6 h-6 mr-3" />

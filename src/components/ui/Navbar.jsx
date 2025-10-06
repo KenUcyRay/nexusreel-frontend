@@ -100,7 +100,7 @@ export default function Navbar() {
               </div>
             </a>
             <a 
-              href="/cinemas" 
+              href="/studios" 
               style={{color: 'black !important'}}
               className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
                 isScrolled 
