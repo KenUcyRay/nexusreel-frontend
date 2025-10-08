@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus, Hamburger } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Navbar from "../ui/MainNavbar";
@@ -145,7 +145,7 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Carousel Section */}
-      <section className="relative h-screen overflow-hidden pt-32">
+      <section className="relative h-screen overflow-hidden pt-28 sm:pt-40">
         <div className="relative h-full">
           {carouselMovies.map((movie, index) => (
             <div
@@ -162,11 +162,11 @@ export default function Home() {
                 <div className="relative h-full flex items-center">
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl text-white" data-aos="fade-up">
-                      <h1 className="text-5xl md:text-7xl font-bold mb-4">{movie.title}</h1>
-                      <p className="text-lg md:text-xl mb-2 text-gray-300">{movie.genre}</p>
-                      <p className="text-lg mb-8 leading-relaxed">{movie.description}</p>
-                      <button className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity">
-                        <Play className="w-5 h-5 mr-2" />
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-tight">{movie.title}</h1>
+                      <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-300">{movie.genre}</p>
+                      <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">{movie.description}</p>
+                      <button className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base">
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                         Watch Trailer
                       </button>
                     </div>
@@ -194,39 +194,39 @@ export default function Home() {
       </section>
 
       {/* Quick Actions */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-8" data-aos="fade-up">
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-8" data-aos="fade-up">
             <a
               href="/movies"
-              className="flex items-center px-8 py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg"
+              className="flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg w-full sm:w-auto justify-center"
             >
-              <Calendar className="w-6 h-6 mr-3" />
+              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
               Movies
             </a>
             <a
               href="/booking"
-              className="flex items-center px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg"
+              className="flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg w-full sm:w-auto justify-center"
             >
-              < BookPlus className="w-6 h-6 mr-3" />
+              < BookPlus className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
               Bookings
             </a>
              <a
-              href="/studios"
-              className="flex items-center px-8 py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg"
+              href="/food"
+              className="flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-white text-gray-800 border-2 border-gray-200 rounded-xl font-semibold hover:border-[#FFA500] hover:text-[#FFA500] transition-colors shadow-lg w-full sm:w-auto justify-center"
             >
-              <Film className="w-6 h-6 mr-3" />
-              Studios
+              <Hamburger className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+              Food
             </a>
           </div>
         </div>
       </section>
 
       {/* Now Playing Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12" data-aos="fade-up">Now Playing</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12" data-aos="fade-up">Now Playing</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
             {nowPlayingMovies.map((movie, index) => (
               <div 
                 key={movie.id} 
@@ -238,18 +238,18 @@ export default function Home() {
                   <img
                     src={movie.poster}
                     alt={movie.title}
-                    className="w-full h-80 object-cover"
+                    className="w-full h-64 sm:h-72 lg:h-80 object-cover"
                   />
-                  <div className="absolute top-4 right-4 bg-black/70 text-white px-2 py-1 rounded-lg flex items-center">
-                    <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                    <span className="text-sm font-semibold">{movie.rating}</span>
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-black/70 text-white px-2 py-1 rounded-lg flex items-center">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 mr-1" />
+                    <span className="text-xs sm:text-sm font-semibold">{movie.rating}</span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{movie.title}</h3>
-                  <p className="text-gray-600 mb-2">{movie.genre}</p>
-                  <p className="text-gray-500 text-sm mb-4">{movie.duration}</p>
-                  <button className="w-full py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 line-clamp-2">{movie.title}</h3>
+                  <p className="text-gray-600 mb-2 text-sm sm:text-base">{movie.genre}</p>
+                  <p className="text-gray-500 text-xs sm:text-sm mb-4">{movie.duration}</p>
+                  <button className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base">
                     Book Now
                   </button>
                 </div>
@@ -260,10 +260,10 @@ export default function Home() {
       </section>
 
       {/* Coming Soon Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12" data-aos="fade-up">Coming Soon</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12" data-aos="fade-up">Coming Soon</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
             {comingSoonMovies.map((movie, index) => (
               <div 
                 key={movie.id} 
@@ -275,18 +275,18 @@ export default function Home() {
                   <img
                     src={movie.poster}
                     alt={movie.title}
-                    className="w-full h-80 object-cover"
+                    className="w-full h-64 sm:h-72 lg:h-80 object-cover"
                   />
-                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-lg">
-                    <span className="text-sm font-semibold">Coming Soon</span>
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-red-500 text-white px-2 sm:px-3 py-1 rounded-lg">
+                    <span className="text-xs sm:text-sm font-semibold">Coming Soon</span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{movie.title}</h3>
-                  <p className="text-gray-600 mb-2">{movie.genre}</p>
-                  <p className="text-gray-500 text-sm mb-2">{movie.duration}</p>
-                  <p className="text-[#FFA500] font-semibold mb-4">Release: {movie.releaseDate}</p>
-                  <button className="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 line-clamp-2">{movie.title}</h3>
+                  <p className="text-gray-600 mb-2 text-sm sm:text-base">{movie.genre}</p>
+                  <p className="text-gray-500 text-xs sm:text-sm mb-2">{movie.duration}</p>
+                  <p className="text-[#FFA500] font-semibold mb-4 text-sm sm:text-base">Release: {movie.releaseDate}</p>
+                  <button className="w-full py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors text-sm sm:text-base">
                     Notify Me
                   </button>
                 </div>
@@ -297,36 +297,36 @@ export default function Home() {
       </section>
 
       {/* Social Media Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-8" data-aos="fade-up">Follow Us</h2>
-          <p className="text-gray-600 mb-12 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-6 sm:mb-8" data-aos="fade-up">Follow Us</h2>
+          <p className="text-gray-600 mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base" data-aos="fade-up" data-aos-delay="100">
             Ikuti akun media sosial kami untuk mendapatkan update film terbaru, promo menarik, dan berita terkini dari Nexus Cinema.
           </p>
-          <div className="flex justify-center space-x-8" data-aos="fade-up" data-aos-delay="200">
+          <div className="flex justify-center space-x-4 sm:space-x-6 lg:space-x-8" data-aos="fade-up" data-aos-delay="200">
             <a
               href="#"
-              className="flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+              className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-lg"
             >
-              <Facebook className="w-8 h-8" />
+              <Facebook className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
             </a>
             <a
               href="#"
-              className="flex items-center justify-center w-16 h-16 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition-colors shadow-lg"
+              className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition-colors shadow-lg"
             >
-              <Instagram className="w-8 h-8" />
+              <Instagram className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
             </a>
             <a
               href="#"
-              className="flex items-center justify-center w-16 h-16 bg-blue-400 text-white rounded-full hover:bg-blue-500 transition-colors shadow-lg"
+              className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-blue-400 text-white rounded-full hover:bg-blue-500 transition-colors shadow-lg"
             >
-              <Twitter className="w-8 h-8" />
+              <Twitter className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
             </a>
             <a
               href="#"
-              className="flex items-center justify-center w-16 h-16 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg"
+              className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg"
             >
-              <Youtube className="w-8 h-8" />
+              <Youtube className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
             </a>
           </div>
         </div>

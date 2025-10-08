@@ -45,22 +45,22 @@ export default function Footer() {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF6B35]"></div>
 
         {/* Main footer content */}
-        <div className="relative container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        <div className="relative container mx-auto px-4 py-8 sm:py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
             
             {/* Brand section */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center space-x-2 group cursor-pointer">
-                <img src={logo} alt="Logo" className="w-8 h-8" />
+                <img src={logo} alt="Logo" className="w-6 h-6 sm:w-8 sm:h-8" />
                 <div>
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
+                  <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">
                     NexusVerse
                   </h3>
                   <p className="text-xs text-gray-400">Your Premium Movie Experience</p>
                 </div>
               </div>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
                 Experience cinema like never before with state-of-the-art technology and ultimate comfort.
               </p>
 
@@ -71,26 +71,26 @@ export default function Footer() {
                     key={index}
                     onMouseEnter={() => setHoveredSocial(index)}
                     onMouseLeave={() => setHoveredSocial(null)}
-                    className={`p-2 bg-gray-700/50 backdrop-blur-sm rounded-lg transition-all duration-300 transform hover:scale-110 ${social.color} hover:shadow-lg hover:text-white`}
+                    className={`p-1.5 sm:p-2 bg-gray-700/50 backdrop-blur-sm rounded-lg transition-all duration-300 transform hover:scale-110 ${social.color} hover:shadow-lg hover:text-white`}
                     aria-label={social.name}
                   >
-                    <social.icon className={`w-4 h-4 ${hoveredSocial === index ? 'text-white' : 'text-gray-300'}`} />
+                    <social.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${hoveredSocial === index ? 'text-white' : 'text-gray-300'}`} />
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold flex items-center space-x-2">
-                <Ticket className="w-5 h-5 text-orange-400" />
+            <div className="space-y-3 sm:space-y-4">
+              <h4 className="text-base sm:text-lg font-semibold flex items-center space-x-2">
+                <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
                 <span>Quick Links</span>
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-1.5 sm:space-y-2">
                 {quickLinks.map((link, index) => (
                   <li key={index}>
-                    <a href="#" className="group flex items-center space-x-2 text-sm text-gray-300 hover:text-orange-400 transition-colors">
-                      <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                    <a href="#" className="group flex items-center space-x-2 text-xs sm:text-sm text-gray-300 hover:text-orange-400 transition-colors">
+                      <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 transform group-hover:translate-x-1 transition-transform" />
                       <span>{link}</span>
                     </a>
                   </li>
@@ -99,20 +99,20 @@ export default function Footer() {
             </div>
 
             {/* Contact */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold">Contact Us</h4>
+            <div className="space-y-3 sm:space-y-4">
+              <h4 className="text-base sm:text-lg font-semibold">Contact Us</h4>
               
-              <div className="space-y-3 text-sm text-gray-300">
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
                 <div className="flex items-start space-x-2">
-                  <MapPin className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 mt-0.5 flex-shrink-0" />
                   <span>Jl. Cinema Plaza No. 88, Bandung</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Phone className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                  <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 flex-shrink-0" />
                   <span>+62 22 1234 5678</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 flex-shrink-0" />
                   <span>10:00 - 22:00 Daily</span>
                 </div>
               </div>
@@ -120,13 +120,13 @@ export default function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="pt-6 mt-6 border-t border-gray-700/50">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-              <p className="text-sm text-gray-400">
+          <div className="pt-4 sm:pt-6 mt-4 sm:mt-6 border-t border-gray-700/50">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
+              <p className="text-xs sm:text-sm text-gray-400 text-center md:text-left">
                 © {currentYear} NexusVerse. All rights reserved.
               </p>
               
-              <div className="flex items-center space-x-4 text-sm">
+              <div className="flex flex-wrap items-center justify-center space-x-2 sm:space-x-4 text-xs sm:text-sm">
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors">Privacy Policy</a>
                 <span className="text-gray-600">•</span>
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors">Terms of Service</a>
@@ -134,9 +134,9 @@ export default function Footer() {
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors">Cookie Policy</a>
               </div>
 
-              <div className="flex items-center space-x-1 text-sm text-gray-400">
+              <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-400">
                 <span>Made with</span>
-                <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
+                <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 fill-red-500 animate-pulse" />
                 <span>for movie lovers</span>
               </div>
             </div>

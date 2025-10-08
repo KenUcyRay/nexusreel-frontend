@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, User, Film, MapPin, Calendar } from 'lucide-react';
+import { Menu, User, Film, MapPin, Calendar, Hamburger } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import homeIcon from '../../assets/home.png';
 import aboutIcon from '../../assets/about.png';
@@ -7,6 +8,7 @@ import aboutIcon from '../../assets/about.png';
 export default function MainNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,11 +35,11 @@ export default function MainNavbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <a href="/" className="flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium py-2 border-b-2 border-transparent hover:border-gray-700" style={{color: 'black !important'}}>
+            <a href="/" className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium py-2 border-b-2 ${location.pathname === '/' ? 'border-[#FFA500] text-[#FFA500]' : 'border-transparent hover:border-gray-700'}`} style={{color: location.pathname === '/' ? '#FFA500 !important' : 'black !important'}}>
               <img src={homeIcon} alt="Home" className="w-10 h-10" />
               <span>Home</span>
             </a>
-            <a href="/about" className="flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium py-2 border-b-2 border-transparent hover:border-gray-700" style={{color: 'black !important'}}>
+            <a href="/about" className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium py-2 border-b-2 ${location.pathname === '/about' ? 'border-[#FFA500] text-[#FFA500]' : 'border-transparent hover:border-gray-700'}`} style={{color: location.pathname === '/about' ? '#FFA500 !important' : 'black !important'}}>
               <img src={aboutIcon} alt="About" className="w-10 h-10" />
               <span>About</span>
             </a>
@@ -75,58 +77,58 @@ export default function MainNavbar() {
             isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}>
             <img src={logo} alt="Logo" className="w-7 h-7" />
-            <span className="text-lg font-bold text-[#FFA500]">NexusVerse</span>
+            <span className="text-lg font-bold text-[#FFA500] hidden sm:block">NexusVerse</span>
           </div>
 
           {/* Center menu - card style */}
-          <div className={`flex items-center transition-all duration-300 ${
+          <div className={`flex items-center transition-all duration-300 overflow-x-auto ${
             isScrolled 
-              ? 'space-x-8' 
+              ? 'space-x-4 sm:space-x-8' 
               : 'bg-white border border-gray-300 rounded-full shadow-md hover:shadow-lg'
           }`}>
             <a 
               href="/movies" 
-              style={{color: 'black !important'}}
-              className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
+              style={{color: location.pathname === '/movies' ? '#FFA500 !important' : 'black !important'}}
+              className={`flex items-center space-x-1 sm:space-x-2 text-black hover:text-[#FFA500] transition-all font-medium whitespace-nowrap ${
                 isScrolled 
-                  ? 'py-2 border-b-2 border-gray-700' 
-                  : 'py-4 px-6 border-r border-gray-200'
+                  ? `py-2 border-b-2 ${location.pathname === '/movies' ? 'border-[#FFA500]' : 'border-transparent hover:border-gray-700'}` 
+                  : 'py-3 sm:py-4 px-3 sm:px-6 border-r border-gray-200'
               }`}
             >
-              <Film className="w-5 h-5" />
+              <Film className="w-4 h-4 sm:w-5 sm:h-5" />
               <div className="flex flex-col">
-                <span className="font-semibold text-sm">Movies</span>
-                {!isScrolled && <span className="text-xs text-gray-500">Films now showing and coming soon</span>}
+                <span className="font-semibold text-xs sm:text-sm">Movies</span>
+                {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Films now showing and coming soon</span>}
               </div>
             </a>
             <a 
-              href="/studios" 
-              style={{color: 'black !important'}}
-              className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
+              href="/food" 
+              style={{color: location.pathname === '/food' ? '#FFA500 !important' : 'black !important'}}
+              className={`flex items-center space-x-1 sm:space-x-2 text-black hover:text-[#FFA500] transition-all font-medium whitespace-nowrap ${
                 isScrolled 
-                  ? 'py-2 border-b-2 border-transparent hover:border-gray-700' 
-                  : 'py-4 px-6 border-r border-gray-200'
+                  ? `py-2 border-b-2 ${location.pathname === '/food' ? 'border-[#FFA500]' : 'border-transparent hover:border-gray-700'}` 
+                  : 'py-3 sm:py-4 px-3 sm:px-6 border-r border-gray-200'
               }`}
             >
-              <MapPin className="w-5 h-5" />
+              <Hamburger className="w-4 h-4 sm:w-5 sm:h-5" />
               <div className="flex flex-col">
-                <span className="font-semibold text-sm">Studio</span>
-                {!isScrolled && <span className="text-xs text-gray-500">Find comfortable studios</span>}
+                <span className="font-semibold text-xs sm:text-sm">Foods</span>
+                {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Enjoy Your Movie With NexFood</span>}
               </div>
             </a>
             <a 
               href="/booking" 
-              style={{color: 'black !important'}}
-              className={`flex items-center space-x-2 text-black hover:text-[#FFA500] transition-all font-medium ${
+              style={{color: location.pathname === '/booking' ? '#FFA500 !important' : 'black !important'}}
+              className={`flex items-center space-x-1 sm:space-x-2 text-black hover:text-[#FFA500] transition-all font-medium whitespace-nowrap ${
                 isScrolled 
-                  ? 'py-2 border-b-2 border-transparent hover:border-gray-700' 
-                  : 'py-4 px-6'
+                  ? `py-2 border-b-2 ${location.pathname === '/booking' ? 'border-[#FFA500]' : 'border-transparent hover:border-gray-700'}` 
+                  : 'py-3 sm:py-4 px-3 sm:px-6'
               }`}
             >
-              <Calendar className="w-5 h-5" />
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
               <div className="flex flex-col">
-                <span className="font-semibold text-sm">Booking</span>
-                {!isScrolled && <span className="text-xs text-gray-500">Reserve seats</span>}
+                <span className="font-semibold text-xs sm:text-sm">Booking</span>
+                {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Reserve seats</span>}
               </div>
             </a>
           </div>

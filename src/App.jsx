@@ -3,7 +3,7 @@ import Login from "./components/Auth/Login"
 import Register from "./components/Auth/Register"
 import Home from "./components/Pages/Home"
 import Movies from "./components/Pages/Movies"
-import Studio from "./components/Pages/Studio"
+import Food from "./components/Pages/Food"
 import Booking from "./components/Pages/Booking"
 import About from "./components/Pages/About"
 import Footer from "./components/ui/Footer"
@@ -20,7 +20,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/movies" element={<Movies />} />
-            <Route path="/studios" element={<Studio />} />
+            <Route path="/food" element={<Food />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
