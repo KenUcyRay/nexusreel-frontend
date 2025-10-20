@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, User, Film, MapPin, Calendar, Hamburger } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Menu, User, Film, MapPin, Calendar, Hamburger, LogOut } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../contexts/AuthContext';
 import logo from '../../assets/logo.png';
 import homeIcon from '../../assets/home.png';
 import aboutIcon from '../../assets/about.png';
@@ -9,6 +10,25 @@ export default function MainNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthContext();
+
+  const handleLogout = async () => {
+    await logout();
+    setIsMenuOpen(false);
+    navigate('/login');
+  };
+
+  const handleRoleNavigation = () => {
+    if (user?.role === 'admin') {
+      navigate('/admin/dashboard');
+    } else if (user?.role === 'owner') {
+      navigate('/owner/dashboard');
+    } else if (user?.role === 'kasir') {
+      navigate('/kasir/dashboard');
+    }
+    setIsMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,12 +76,52 @@ export default function MainNavbar() {
               </button>
               {isMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-                  <a href="/login" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors font-medium">
-                    Log in
-                  </a>
-                  <a href="/register" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                    Sign up
-                  </a>
+                  {user ? (
+                    <>
+                      <div className="px-4 py-2 border-b border-gray-200">
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                      </div>
+                      
+                      {user.role === 'user' && (
+                        <>
+                          <a href="/profile" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+                            Profile
+                          </a>
+                          <a href="/history" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                            History
+                          </a>
+                        </>
+                      )}
+                      
+                      {(user.role === 'admin' || user.role === 'owner' || user.role === 'kasir') && (
+                        <button 
+                          onClick={handleRoleNavigation}
+                          className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                        >
+                          Dashboard
+                        </button>
+                      )}
+                      
+                      <hr className="my-2 border-gray-200" />
+                      <button 
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors font-medium"
+                      >
+                        <LogOut className="inline w-4 h-4 mr-2" />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <a href="/login" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+                        Log in
+                      </a>
+                      <a href="/register" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                        Sign up
+                      </a>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -113,7 +173,7 @@ export default function MainNavbar() {
               <Hamburger className="w-4 h-4 sm:w-5 sm:h-5" />
               <div className="flex flex-col">
                 <span className="font-semibold text-xs sm:text-sm">Foods</span>
-                {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Enjoy Your Movie With NexFood</span>}
+                {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Enjoy your movie with NexFood</span>}
               </div>
             </a>
             <a 

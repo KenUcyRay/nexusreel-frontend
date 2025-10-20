@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, User, Home } from 'lucide-react';
-import { useAuthContext } from '../../contexts/AuthContext';
-import loginImage from '../../assets/login.png';
-import Toast from '../ui/Toast';
-import { useToast } from '../../hooks/useToast';
+import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
+import axios from 'axios';
 
-export default function Login() {
+export default function SimpleTokenLogin() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [email, setEmail] = useState('user@cinema.com');
+  const [password, setPassword] = useState('password');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuthContext();
   const navigate = useNavigate();
-  const { toast, showToast, hideToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,21 +17,29 @@ export default function Login() {
     setError('');
     
     try {
-      const credentials = {
+      console.log('Attempting token-based login...');
+      
+      const response = await axios.post('http://localhost:8000/api/login', {
         email,
         password
-      };
+      }, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
       
-      console.log('Attempting login with:', credentials);
+      console.log('Login successful:', response.data);
       
-      const result = await login(credentials);
-      if (result.user) {
-        showToast('Login successful! Welcome back.', 'success');
-        setTimeout(() => {
-          navigate('/home');
-        }, 1500);
+      // Store token
+      if (response.data.token) {
+        localStorage.setItem('auth_token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        navigate('/home');
       }
+      
     } catch (error) {
+      console.error('Login failed:', error);
       setError(error.response?.data?.message || 'Login failed');
     } finally {
       setIsLoading(false);
@@ -46,17 +48,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#FFD700] to-[#FFA500]">
-      {/* Back to Website Button */}
-      <div className="absolute top-4 right-4 z-10">
-        <button
-          onClick={() => navigate('/home')}
-          className="flex items-center bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition-opacity"
-        >
-          <Home className="w-4 h-4 mr-2" />
-          Back to Website
-        </button>
-      </div>
-      
       <div className="flex min-h-screen">
         <div className="flex w-full md:w-1/2 items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
           <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl w-full max-w-sm p-4 sm:p-6">
@@ -64,8 +55,8 @@ export default function Login() {
               <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-2xl flex items-center justify-center mb-2 sm:mb-3 shadow-lg">
                 <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <h2 className="text-xl sm:text-2xl text-gray-900 font-bold mb-1">Welcome Back</h2>
-              <p className="text-gray-600 text-xs sm:text-sm">Sign in to your account</p>
+              <h2 className="text-xl sm:text-2xl text-gray-900 font-bold mb-1">Token Login</h2>
+              <p className="text-gray-600 text-xs sm:text-sm">No CSRF - Simple Token Auth</p>
             </div>
 
             {error && (
@@ -113,21 +104,6 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs">
-                <label className="flex items-center gap-1.5 sm:gap-2">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-500"
-                  />
-                  <span className="text-xs">Remember me</span>
-                </label>
-                <Link to="/forgot-password" className="text-orange-600 hover:underline text-xs">
-                  Forgot password?
-                </Link>
-              </div>
-
               <button
                 type="submit"
                 disabled={isLoading}
@@ -137,13 +113,16 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="flex items-center my-3 sm:my-4">
-              <span className="flex-1 h-px bg-gray-200"></span>
-              <span className="px-3 sm:px-4 text-xs text-gray-400">or</span>
-              <span className="flex-1 h-px bg-gray-200"></span>
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-xs">
+              <strong>🔑 Token-Based Auth:</strong>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>No CSRF tokens needed</li>
+                <li>Direct API calls</li>
+                <li>Bearer token authentication</li>
+              </ul>
             </div>
 
-            <p className="text-center text-xs text-gray-700">
+            <p className="text-center text-xs text-gray-700 mt-4">
               Don't have an account?{' '}
               <Link to="/register" className="text-blue-500 hover:underline">
                 Create account
@@ -151,22 +130,7 @@ export default function Login() {
             </p>
           </div>
         </div>
-
-        <div className="hidden md:flex w-1/2 items-center justify-center px-6 sm:px-8 py-8 sm:py-12">
-          <img
-            src={loginImage}
-            alt="Login Illustration"
-            className="w-4/5 drop-shadow-xl"
-          />
-        </div>
       </div>
-      
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.isVisible}
-        onClose={hideToast}
-      />
     </div>
   );
 }

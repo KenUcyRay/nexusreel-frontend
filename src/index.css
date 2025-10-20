@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+/* Toast Animation */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Toast button specific styles */
+.toast-close-btn {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.toast-close-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Custom style tambahan */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

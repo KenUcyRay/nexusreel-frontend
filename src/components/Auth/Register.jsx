@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, User, UserPlus } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, User, UserPlus, Home } from 'lucide-react';
+import { useAuthContext } from '../../contexts/AuthContext';
 import registerImage from '../../assets/register.png';
 
 export default function Register() {
@@ -8,18 +9,56 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuthContext();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register form submitted');
+    setIsLoading(true);
+    setError('');
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
+      const userData = {
+        name,
+        email,
+        password,
+        password_confirmation: confirmPassword
+      };
+      
+      const result = await register(userData);
+      if (result.user) {
+        navigate('/home');
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Registration failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#FFD700] to-[#FFA500]">
+      {/* Back to Website Button */}
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={() => navigate('/home')}
+          className="flex items-center bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition-opacity"
+        >
+          <Home className="w-4 h-4 mr-2" />
+          Back to Website
+        </button>
+      </div>
+      
       <div className="flex min-h-screen">
         <div className="flex w-full md:w-1/2 items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
           <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl w-full max-w-sm p-4 sm:p-6">
@@ -30,6 +69,12 @@ export default function Register() {
               <h2 className="text-xl sm:text-2xl text-gray-900 font-bold mb-1">Create Account</h2>
               <p className="text-gray-600 text-xs sm:text-sm">Join Nexus Cinema today</p>
             </div>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-4 text-xs">
+                {error}
+              </div>
+            )}
 
             <form className="space-y-2.5 sm:space-y-3" onSubmit={handleSubmit}>
               <div>
@@ -56,9 +101,12 @@ export default function Register() {
                     className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-300 outline-none text-xs sm:text-sm"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </div>
               </div>
+
+
 
               <div>
                 <label className="block text-gray-700 font-medium mb-1 text-xs sm:text-sm">Password</label>
@@ -102,21 +150,14 @@ export default function Register() {
                 </div>
               </div>
 
-              <label className="flex items-center gap-1.5 sm:gap-2">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500"
-                />
-                <span className="text-xs sm:text-sm">Remember me</span>
-              </label>
+
 
               <button
                 type="submit"
-                className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white font-semibold rounded-lg hover:opacity-90 transition duration-200 text-xs sm:text-sm"
+                disabled={isLoading}
+                className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white font-semibold rounded-lg hover:opacity-90 transition duration-200 text-xs sm:text-sm disabled:opacity-50"
               >
-                Create Account
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
 

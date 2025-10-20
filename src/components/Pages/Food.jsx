@@ -157,9 +157,9 @@ export default function Food() {
                   
                   <button
                     disabled={cart.length === 0}
-                    className="w-full py-4 bg-gray-400 text-white rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Lanjut
+                    Checkout
                   </button>
                 </div>
               </div>

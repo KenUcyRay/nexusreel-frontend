@@ -36,77 +36,44 @@ export default function About() {
           <div className="text-center mb-12 sm:mb-16" data-aos="fade-up">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4 sm:mb-6">Who We Are</h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Nexus Cinema adalah destinasi hiburan terdepan yang menghadirkan pengalaman menonton film terbaik 
-              dengan teknologi canggih dan kenyamanan premium untuk seluruh keluarga.
+              Nexus Cinema is a leading entertainment destination that delivers the ultimate movie-watching experience with advanced 
+              technology and premium comfort for the whole family.
             </p>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            <div className="text-center" data-aos="fade-up" data-aos-delay="100">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <Users className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 sm:mb-2">10M+</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Happy Customers</p>
-            </div>
-
-            <div className="text-center" data-aos="fade-up" data-aos-delay="200">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <Award className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 sm:mb-2">50+</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Awards Won</p>
-            </div>
-
-            <div className="text-center" data-aos="fade-up" data-aos-delay="300">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <MapPin className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 sm:mb-2">25+</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Locations</p>
-            </div>
-
-            <div className="text-center" data-aos="fade-up" data-aos-delay="400">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <Clock className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 sm:mb-2">15+</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Years Experience</p>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-12 sm:py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
-            <div data-aos="fade-right">
-              <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Our Mission</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
-                Memberikan pengalaman menonton film yang tak terlupakan melalui teknologi terdepan, 
-                layanan berkualitas tinggi, dan suasana yang nyaman untuk semua kalangan.
-              </p>
-              <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                Kami berkomitmen untuk terus berinovasi dalam menghadirkan hiburan terbaik 
-                dan menjadi pilihan utama masyarakat untuk menikmati film-film berkualitas.
-              </p>
-            </div>
+     <section className="py-12 sm:py-16 bg-gray-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+      <div data-aos="fade-right">
+        <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Our Mission</h3>
+        <p className="text-gray-600 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
+          Providing an unforgettable movie-watching experience through cutting-edge technology, 
+          high-quality service, and a comfortable atmosphere for everyone.
+        </p>
+        <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+          We are committed to continuously innovating to deliver the best entertainment 
+          and to become the top choice for people seeking high-quality films.
+        </p>
+      </div>
 
-            <div data-aos="fade-left">
-              <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Our Vision</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
-                Menjadi jaringan bioskop terdepan di Indonesia yang dikenal dengan standar 
-                kualitas internasional dan pengalaman menonton yang luar biasa.
-              </p>
-              <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                Menciptakan komunitas pecinta film yang solid dan berkontribusi dalam 
-                perkembangan industri perfilman Indonesia.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div data-aos="fade-left">
+        <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Our Vision</h3>
+        <p className="text-gray-600 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
+          To become Indonesia’s leading cinema network, recognized for its international standards 
+          and extraordinary movie-watching experience.
+        </p>
+        <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+          To build a strong community of movie enthusiasts and contribute to the growth 
+          of Indonesia’s film industry.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Contact Info */}
       <section className="py-12 sm:py-16 bg-white">

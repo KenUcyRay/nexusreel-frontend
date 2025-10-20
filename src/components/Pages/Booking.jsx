@@ -169,7 +169,7 @@ export default function Booking() {
                       onClick={() => setSelectedTime(time)}
                       className={`py-3 px-4 rounded-lg font-medium transition-colors ${
                         selectedTime === time
-                          ? 'bg-[#FFA500] text-white'
+                          ? 'bg-[#FFA500] text-orange-500'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -251,9 +251,9 @@ export default function Booking() {
                       className={`
                         w-8 h-8 text-xs font-medium rounded
                         ${seat.isOccupied 
-                          ? 'bg-gray-400 text-white cursor-not-allowed' 
+                          ? 'bg-gray-400 text-orange-400 cursor-not-allowed' 
                           : selectedSeats.includes(seat.id)
-                          ? 'bg-orange-500 text-white'
+                          ? 'bg-orange-500 text-green-500'
                           : 'bg-teal-100 text-teal-700 hover:bg-teal-200'
                         }
                       `}
