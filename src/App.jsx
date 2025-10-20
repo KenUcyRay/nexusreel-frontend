@@ -15,18 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import AdminDashboard from "./components/Admin/AdminDashboard"
 import OwnerDashboard from "./components/Owner/OwnerDashboard"
 import CashierDashboard from "./components/Cashier/CashierDashboard"
-import TestLogin from "./components/TestLogin"
-import SimpleLogin from "./components/SimpleLogin"
-import Dashboard from "./components/Dashboard"
-import DebugLogin from "./components/DebugLogin"
-import AdvancedDebugLogin from "./components/AdvancedDebugLogin"
-import QuickTest from "./components/QuickTest"
-import FixedLogin from "./components/FixedLogin"
-import ConnectionTest from "./components/ConnectionTest"
-import FixedAuthLogin from "./components/FixedAuthLogin"
-import SimpleFixedLogin from "./components/SimpleFixedLogin"
-import NoCsrfLogin from "./components/NoCsrfLogin"
-import SimpleTokenLogin from "./components/SimpleTokenLogin"
+
 import MovieManagement from "./components/Admin/MovieManagement"
 
 function App() {
@@ -46,18 +35,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/test-login" element={<TestLogin />} />
-            <Route path="/simple-login" element={<SimpleLogin />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/debug-login" element={<DebugLogin />} />
-            <Route path="/advanced-debug" element={<AdvancedDebugLogin />} />
-            <Route path="/quick-test" element={<QuickTest />} />
-            <Route path="/fixed-login" element={<FixedLogin />} />
-            <Route path="/connection-test" element={<ConnectionTest />} />
-            <Route path="/fixed-auth" element={<FixedAuthLogin />} />
-            <Route path="/simple-login" element={<SimpleFixedLogin />} />
-            <Route path="/no-csrf" element={<NoCsrfLogin />} />
-            <Route path="/token-login" element={<SimpleTokenLogin />} />
+
             <Route path="/history" element={
               <ProtectedRoute roles={['user']}>
                 <History />
