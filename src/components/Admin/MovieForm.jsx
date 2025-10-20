@@ -151,24 +151,35 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">
-                        {movie ? 'Edit Movie' : 'Add New Movie'}
-                    </h2>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        <X className="w-6 h-6" />
-                    </button>
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[95vh] overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] px-6 py-4">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                <ImageIcon className="w-5 h-5 text-white" />
+                            </div>
+                            <h2 className="text-xl font-bold text-white">
+                                {movie ? 'Edit Movie' : 'Add New Movie'}
+                            </h2>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="text-white hover:text-gray-200 p-1 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-200"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Form Container */}
+                <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(95vh - 80px)' }}>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Movie Name */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Movie Name *
                         </label>
                         <input
@@ -176,17 +187,22 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                             placeholder="Enter movie name"
                         />
                         {errors.name && (
-                            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.name}
+                            </p>
                         )}
                     </div>
 
                     {/* Genre */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Genre *
                         </label>
                         <input
@@ -194,17 +210,22 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                             name="genre"
                             value={formData.genre}
                             onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                             placeholder="e.g. Action, Adventure, Drama"
                         />
                         {errors.genre && (
-                            <p className="text-red-500 text-sm mt-1">{errors.genre}</p>
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.genre}
+                            </p>
                         )}
                     </div>
 
                     {/* Duration */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Duration (minutes) *
                         </label>
                         <input
@@ -213,24 +234,29 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                             value={formData.duration}
                             onChange={handleInputChange}
                             min="1"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                             placeholder="e.g. 120"
                         />
                         {errors.duration && (
-                            <p className="text-red-500 text-sm mt-1">{errors.duration}</p>
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.duration}
+                            </p>
                         )}
                     </div>
 
                     {/* Status */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Status *
                         </label>
                         <select
                             name="status"
                             value={formData.status}
                             onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                         >
                             <option value="coming_soon">Coming Soon</option>
                             <option value="live_now">Live Now</option>
@@ -239,21 +265,26 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
 
                     {/* Image Upload */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Movie Poster {!movie && '*'}
                         </label>
                         
                         {imagePreview && (
-                            <div className="mb-2">
-                                <img
-                                    src={imagePreview}
-                                    alt="Preview"
-                                    className="w-32 h-48 object-cover rounded border"
-                                />
+                            <div className="mb-4 flex justify-center">
+                                <div className="relative">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="w-40 h-56 object-cover rounded-xl shadow-lg border-2 border-gray-200"
+                                    />
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-xs font-bold">✓</span>
+                                    </div>
+                                </div>
                             </div>
                         )}
                         
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200 bg-gray-50">
                             <input
                                 type="file"
                                 accept="image/*"
@@ -265,39 +296,54 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                                 htmlFor="image-upload"
                                 className="cursor-pointer flex flex-col items-center"
                             >
-                                <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                                <span className="text-sm text-gray-600">
-                                    Click to upload image
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                                    <Upload className="w-6 h-6 text-blue-600" />
+                                </div>
+                                <span className="text-sm font-medium text-gray-700 mb-1">
+                                    Click to upload poster
                                 </span>
-                                <span className="text-xs text-gray-400">
+                                <span className="text-xs text-gray-500">
                                     PNG, JPG up to 2MB
                                 </span>
                             </label>
                         </div>
                         
                         {errors.image && (
-                            <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.image}
+                            </p>
                         )}
                     </div>
 
                     {/* Submit Buttons */}
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex gap-4 pt-6 border-t border-gray-200">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                            className="flex-1 px-6 py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg hover:from-orange-400 hover:to-orange-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-200 shadow-md"
                         >
-                            {loading ? 'Saving...' : (movie ? 'Update' : 'Create')}
+                            {loading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                    Saving...
+                                </div>
+                            ) : (
+                                movie ? 'Update Movie' : 'Create Movie'
+                            )}
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
     );
