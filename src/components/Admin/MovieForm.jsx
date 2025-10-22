@@ -158,7 +158,7 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                                <ImageIcon className="w-5 h-5 text-white" />
+                                <ImageIcon className="w-5 h-5 text-grey" />
                             </div>
                             <h2 className="text-xl font-bold text-white">
                                 {movie ? 'Edit Movie' : 'Add New Movie'}
@@ -166,7 +166,7 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                         </div>
                         <button
                             onClick={onClose}
-                            className="text-white hover:text-gray-200 p-1 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-200"
+                            className="text-red-400 hover:text-gray-200 p-1 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-200"
                         >
                             <X className="w-6 h-6" />
                         </button>

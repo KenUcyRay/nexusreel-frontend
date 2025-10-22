@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, User, Film, MapPin, Calendar, Hamburger, LogOut } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
+import api from '../../utils/api';
 import logo from '../../assets/logo.png';
 import homeIcon from '../../assets/home.png';
 import aboutIcon from '../../assets/about.png';
@@ -9,6 +10,7 @@ import aboutIcon from '../../assets/about.png';
 export default function MainNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthContext();
@@ -37,6 +39,21 @@ export default function MainNavbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadUserProfile();
+    }
+  }, [user]);
+
+  const loadUserProfile = async () => {
+    try {
+      const response = await api.get('/api/profile');
+      setUserProfile(response.data);
+    } catch (error) {
+      console.error('Failed to load user profile:', error);
+    }
+  };
 
   return (
     <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
@@ -72,7 +89,18 @@ export default function MainNavbar() {
                 className="flex items-center space-x-2 border border-gray-300 rounded-full py-2 px-3 hover:shadow-md transition-shadow"
               >
                 <Menu className="w-4 h-4 text-gray-700" />
-                <User className="w-6 h-6 text-gray-700 bg-gray-500 rounded-full p-1" />
+                {userProfile?.avatar ? (
+                  <img 
+                    src={`http://localhost:8000/storage/${userProfile.avatar}`} 
+                    alt="Profile" 
+                    className="w-6 h-6 rounded-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                ) : null}
+                <User className={`w-6 h-6 text-gray-700 bg-gray-500 rounded-full p-1 ${userProfile?.avatar ? 'hidden' : 'block'}`} />
               </button>
               {isMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">

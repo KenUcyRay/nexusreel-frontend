@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import AdminSidebar from './AdminSidebar';
 import AdminDashboard from './AdminDashboard';
 import MovieManagement from './MovieManagement';
+import UserManagement from './UserManagement';
+import ProfileAdmin from './ProfileAdmin';
+import FoodManagement from './FoodManagement';
+import TransactionManagement from './TransactionManagement';
 
 const AdminLayout = () => {
     const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -13,19 +17,9 @@ const AdminLayout = () => {
             case 'movies':
                 return <MovieManagement />;
             case 'users':
-                return (
-                    <div className="p-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">User Management</h2>
-                        <p className="text-gray-600">User management functionality coming soon...</p>
-                    </div>
-                );
+                return <UserManagement />;
             case 'food':
-                return (
-                    <div className="p-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Food Management</h2>
-                        <p className="text-gray-600">Food management functionality coming soon...</p>
-                    </div>
-                );
+                return <FoodManagement />;
             case 'bookings':
                 return (
                     <div className="p-8">
@@ -33,6 +27,10 @@ const AdminLayout = () => {
                         <p className="text-gray-600">Booking management functionality coming soon...</p>
                     </div>
                 );
+            case 'transactions':
+                return <TransactionManagement />;
+            case 'profile':
+                return <ProfileAdmin />;
             default:
                 return <AdminDashboard />;
         }
