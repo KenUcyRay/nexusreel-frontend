@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Film, Users, Coffee, Calendar, Home, LogOut, ArrowLeft, MonitorCog, User, CreditCard } from 'lucide-react';
+import { Film, Users, Coffee, Calendar, Home, LogOut, ArrowLeft, MonitorCog, User, CreditCard, DoorOpen, CircleDollarSign } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import api from '../../utils/api';
 
@@ -24,11 +24,12 @@ const AdminSidebar = ({ activeMenu, onMenuChange }) => {
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: Home },
+        { id: 'studio', label: 'Manage Studio', icon: DoorOpen },
         { id: 'movies', label: 'Manage Movies', icon: Film },
         { id: 'users', label: 'Manage Users', icon: Users },
         { id: 'food', label: 'Manage Food', icon: Coffee },
-        { id: 'bookings', label: 'Manage Bookings', icon: Calendar },
-        { id: 'transactions', label: 'Manage Transactions', icon: CreditCard },
+        { id: 'bookings', label: 'Manage Schedule', icon: Calendar },
+        { id: 'transactions', label: 'Manage Transactions', icon: CircleDollarSign },
     ];
 
     return (
