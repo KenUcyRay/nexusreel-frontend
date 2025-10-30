@@ -31,11 +31,22 @@ export default function Login() {
       console.log('Attempting login with:', credentials);
       
       const result = await login(credentials);
-      if (result.user) {
+      if (result.success && result.user) {
         showToast('Login successful! Welcome back.', 'success');
         setTimeout(() => {
-          navigate('/home');
+          // Navigate based on user role
+          if (result.user.role === 'admin') {
+            navigate('/admin/dashboard');
+          } else if (result.user.role === 'owner') {
+            navigate('/owner/dashboard');
+          } else if (result.user.role === 'kasir') {
+            navigate('/kasir/dashboard');
+          } else {
+            navigate('/');
+          }
         }, 1500);
+      } else {
+        setError(result.message || 'Login failed');
       }
     } catch (error) {
       setError(error.response?.data?.message || 'Login failed');

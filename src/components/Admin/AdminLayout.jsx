@@ -6,6 +6,8 @@ import UserManagement from './UserManagement';
 import ProfileAdmin from './ProfileAdmin';
 import FoodManagement from './FoodManagement';
 import TransactionManagement from './TransactionManagement';
+import StudioManagement from './StudioManagement';
+import ScheduleManagement from './ScheduleManagement';
 
 const AdminLayout = () => {
     const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -14,12 +16,16 @@ const AdminLayout = () => {
         switch (activeMenu) {
             case 'dashboard':
                 return <AdminDashboard />;
+            case 'studio':
+                return <StudioManagement />;
             case 'movies':
                 return <MovieManagement />;
             case 'users':
                 return <UserManagement />;
             case 'food':
                 return <FoodManagement />;
+            case 'schedules':
+                return <ScheduleManagement />;
             case 'bookings':
                 return (
                     <div className="p-8">

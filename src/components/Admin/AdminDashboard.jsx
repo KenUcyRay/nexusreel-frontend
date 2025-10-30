@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
-import { Film, Users, Calendar, DollarSign, Coffee } from 'lucide-react';
+import { Film, Users, DoorOpen, DollarSign, Coffee } from 'lucide-react';
 import RevenueChart from './RevenueChart';
+import studioService from '../../services/studioService';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({
         totalMovies: 0,
         totalUsers: 0,
-        totalBookings: 0,
+        totalStudios: 0,
         totalFoodItems: 0,
     });
     
@@ -27,7 +28,13 @@ const AdminDashboard = () => {
         try {
             // Fetch movies count
             const moviesResponse = await api.get('/api/admin/movies');
-            const totalMovies = moviesResponse.data.length;
+            let movies = [];
+            if (Array.isArray(moviesResponse.data)) {
+                movies = moviesResponse.data;
+            } else if (moviesResponse.data && Array.isArray(moviesResponse.data.data)) {
+                movies = moviesResponse.data.data;
+            }
+            const totalMovies = movies.length;
             
             // Fetch users count
             let totalUsers = 0;
@@ -35,7 +42,8 @@ const AdminDashboard = () => {
                 const usersResponse = await api.get('/api/admin/users');
                 totalUsers = usersResponse.data.length;
             } catch (usersError) {
-                console.log('Users endpoint not available');
+                // Users endpoint not available
+                totalUsers = 0;
             }
             
             // Fetch food count
@@ -44,13 +52,24 @@ const AdminDashboard = () => {
                 const foodResponse = await api.get('/api/admin/foods');
                 totalFoodItems = foodResponse.data.length;
             } catch (foodError) {
-                console.log('Food endpoint not available');
+                // Food endpoint not available
+                totalFoodItems = 0;
+            }
+            
+            // Fetch studios count
+            let totalStudios = 0;
+            try {
+                const studiosResponse = await studioService.getStudios();
+                totalStudios = studiosResponse.data.data?.length || 0;
+            } catch (studiosError) {
+                // Studios endpoint not available - set default value
+                totalStudios = 0;
             }
             
             // Generate recent activities based on data
             const activities = [];
-            if (moviesResponse.data.length > 0) {
-                const latestMovies = moviesResponse.data.slice(-3);
+            if (movies.length > 0) {
+                const latestMovies = movies.slice(-3);
                 latestMovies.forEach(movie => {
                     activities.push({
                         id: `movie-${movie.id}`,
@@ -86,10 +105,11 @@ const AdminDashboard = () => {
             try {
                 const dashboardResponse = await api.get('/api/admin/dashboard');
                 setStats({
-                    ...dashboardResponse.data,
+                    ...dashboardResponse.data.data,
                     totalMovies,
                     totalUsers,
-                    totalFoodItems
+                    totalFoodItems,
+                    totalStudios
                 });
             } catch (dashboardError) {
                 // If dashboard endpoint doesn't exist, just set counts
@@ -97,7 +117,8 @@ const AdminDashboard = () => {
                     ...prevStats,
                     totalMovies,
                     totalUsers,
-                    totalFoodItems
+                    totalFoodItems,
+                    totalStudios
                 }));
             }
         } catch (error) {
@@ -164,12 +185,12 @@ const AdminDashboard = () => {
                     <div className="p-5">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
-                                <Calendar className="h-6 w-6 text-gray-400" />
+                                <DoorOpen className="h-6 w-6 text-gray-400" />
                             </div>
                             <div className="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Bookings</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.totalBookings}</dd>
+                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Studios</dt>
+                                    <dd className="text-lg font-medium text-gray-900">{stats.totalStudios}</dd>
                                 </dl>
                             </div>
                         </div>

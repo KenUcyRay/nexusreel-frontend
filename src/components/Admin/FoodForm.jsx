@@ -22,7 +22,7 @@ const FoodForm = ({ food, onClose, onSave, showToast }) => {
                 description: food.description || '',
                 price: food.price || '',
                 category: food.category || 'snack',
-                is_available: food.is_available !== undefined ? food.is_available : true
+                is_available: food.is_active !== undefined ? food.is_active : true
             });
             if (food.image) {
                 setImagePreview(`http://localhost:8000/storage/${food.image}`);
@@ -113,7 +113,7 @@ const FoodForm = ({ food, onClose, onSave, showToast }) => {
                     submitData.append('description', formData.description);
                     submitData.append('price', formData.price);
                     submitData.append('category', formData.category);
-                    submitData.append('is_available', formData.is_available ? '1' : '0');
+                    submitData.append('is_active', formData.is_available ? '1' : '0');
                     submitData.append('image', imageFile);
                     submitData.append('_method', 'PUT');
                     
@@ -129,7 +129,7 @@ const FoodForm = ({ food, onClose, onSave, showToast }) => {
                         description: formData.description,
                         price: parseInt(formData.price),
                         category: formData.category,
-                        is_available: formData.is_available
+                        is_active: formData.is_available
                     });
                 }
             } else {
@@ -139,7 +139,7 @@ const FoodForm = ({ food, onClose, onSave, showToast }) => {
                 submitData.append('description', formData.description);
                 submitData.append('price', formData.price);
                 submitData.append('category', formData.category);
-                submitData.append('is_available', formData.is_available ? '1' : '0');
+                submitData.append('is_active', formData.is_available ? '1' : '0');
                 
                 if (imageFile) {
                     submitData.append('image', imageFile);

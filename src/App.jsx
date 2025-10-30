@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import AdminLayout from "./components/Admin/AdminLayout"
 import OwnerDashboard from "./components/Owner/OwnerDashboard"
 import CashierDashboard from "./components/Cashier/CashierDashboard"
+import DetailMovies from "./components/Pages/Detail/DetailMovies"
 
 function AppContent() {
   const location = useLocation();
@@ -27,6 +28,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
+          <Route path="/movies/:id" element={<DetailMovies />} />
           <Route path="/food" element={<Food />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/about" element={<About />} />

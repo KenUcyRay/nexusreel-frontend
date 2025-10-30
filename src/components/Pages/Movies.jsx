@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from "../ui/MainNavbar";
 import api from '../../utils/api';
 
 
 
 export default function Movies() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('nowPlaying');
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [comingSoonMovies, setComingSoonMovies] = useState([]);
@@ -14,12 +16,24 @@ export default function Movies() {
   const fetchMovies = async () => {
     try {
       const response = await api.get('/api/movies');
-      const movies = response.data;
+      let movies = [];
       
-      setNowPlayingMovies(movies.filter(movie => movie.status === 'live_now'));
-      setComingSoonMovies(movies.filter(movie => movie.status === 'coming_soon'));
+      // Handle different response structures
+      if (Array.isArray(response.data)) {
+        movies = response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        movies = response.data.data;
+      } else {
+        console.warn('Unexpected API response structure:', response.data);
+        movies = [];
+      }
+      
+      setNowPlayingMovies(movies.filter(movie => movie && movie.status === 'live_now'));
+      setComingSoonMovies(movies.filter(movie => movie && movie.status === 'coming_soon'));
     } catch (error) {
       console.error('Failed to fetch movies:', error);
+      setNowPlayingMovies([]);
+      setComingSoonMovies([]);
     } finally {
       setLoading(false);
     }
@@ -77,7 +91,11 @@ export default function Movies() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
               {(activeTab === 'nowPlaying' ? nowPlayingMovies : comingSoonMovies).map((movie) => (
-                <div key={movie.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div 
+                  key={movie.id} 
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  onClick={() => navigate(`/movies/${movie.id}`)}
+                >
                   <div className="relative">
                     <img
                       src={movie.image ? `http://localhost:8000/storage/${movie.image}` : '/placeholder-movie.jpg'}
@@ -102,12 +120,17 @@ export default function Movies() {
                     {movie.release_date && (
                       <p className="text-[#FFA500] font-semibold mb-4 text-sm sm:text-base">Release: {movie.release_date}</p>
                     )}
-                    <button className={`w-full py-2.5 sm:py-3 rounded-lg font-semibold transition-opacity text-sm sm:text-base ${
-                      activeTab === 'nowPlaying'
-                        ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white hover:opacity-90'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}>
-                      {activeTab === 'nowPlaying' ? 'Book Now' : 'Notify Me'}
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/movies/${movie.id}`);
+                      }}
+                      className={`w-full py-2.5 sm:py-3 rounded-lg font-semibold transition-opacity text-sm sm:text-base ${
+                        activeTab === 'nowPlaying'
+                          ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white hover:opacity-90'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}>
+                      {activeTab === 'nowPlaying' ? 'View Details' : 'View Details'}
                     </button>
                   </div>
                 </div>

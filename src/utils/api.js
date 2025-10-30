@@ -8,12 +8,13 @@ const api = axios.create({
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-    }
+    },
+    withCredentials: true
 });
 
 // Request interceptor to add auth token
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,7 +28,7 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             // Only redirect if not already on login page
             if (!window.location.pathname.includes('/login')) {
-                localStorage.removeItem('auth_token');
+                localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 window.location.href = '/login';
             }

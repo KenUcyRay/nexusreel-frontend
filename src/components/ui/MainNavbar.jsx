@@ -49,7 +49,7 @@ export default function MainNavbar() {
   const loadUserProfile = async () => {
     try {
       const response = await api.get('/api/profile');
-      setUserProfile(response.data);
+      setUserProfile(response.data.data || response.data);
     } catch (error) {
       console.error('Failed to load user profile:', error);
     }
@@ -86,7 +86,7 @@ export default function MainNavbar() {
             <div className="relative">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex items-center space-x-2 border border-gray-300 rounded-full py-2 px-3 hover:shadow-md transition-shadow"
+                className="flex items-center space-x-2 border border-gray-300 rounded-full py-2 px-3 hover:shadow-md transition-shadow cursor-pointer"
               >
                 <Menu className="w-4 h-4 text-gray-700" />
                 {userProfile?.avatar ? (

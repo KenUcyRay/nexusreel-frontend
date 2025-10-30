@@ -16,7 +16,8 @@ const UserManagement = () => {
     const loadUsers = async () => {
         try {
             const response = await api.get('/api/admin/users');
-            setUsers(response.data);
+            const users = response.data.data || response.data || [];
+            setUsers(Array.isArray(users) ? users : []);
         } catch (error) {
             console.error('Failed to load users:', error);
             setUsers([]);
@@ -101,7 +102,7 @@ const UserManagement = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {users.map((user) => (
+                        {Array.isArray(users) && users.map((user) => (
                             <tr key={user.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
@@ -145,7 +146,7 @@ const UserManagement = () => {
                     </tbody>
                 </table>
 
-                {users.length === 0 && (
+                {(!Array.isArray(users) || users.length === 0) && (
                     <div className="text-center py-8 text-gray-500">
                         No users found
                     </div>

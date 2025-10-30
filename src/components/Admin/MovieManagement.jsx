@@ -23,8 +23,22 @@ const MovieManagement = ({ onMovieChange }) => {
     const fetchMovies = async () => {
         try {
             const response = await api.get('/api/admin/movies');
-            setMovies(response.data);
+            let movies = [];
+            
+            // Handle different response structures
+            if (Array.isArray(response.data)) {
+                movies = response.data;
+            } else if (response.data && Array.isArray(response.data.data)) {
+                movies = response.data.data;
+            } else {
+                console.warn('Unexpected API response structure:', response.data);
+                movies = [];
+            }
+            
+            setMovies(movies);
         } catch (error) {
+            console.error('Failed to fetch movies:', error);
+            setMovies([]);
             showToast('Failed to fetch movies', 'error');
         } finally {
             setLoading(false);
@@ -58,11 +72,11 @@ const MovieManagement = ({ onMovieChange }) => {
         return `${baseClasses} bg-yellow-100 text-yellow-700 border border-yellow-200`;
     };
 
-    const filteredMovies = movies.filter(movie => {
-        const matchesSearch = movie.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredMovies = Array.isArray(movies) ? movies.filter(movie => {
+        const matchesSearch = movie && movie.name && movie.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || movie.status === statusFilter;
         return matchesSearch && matchesStatus;
-    });
+    }) : [];
 
     if (loading) {
         return <div className="flex justify-center items-center h-64">Loading...</div>;

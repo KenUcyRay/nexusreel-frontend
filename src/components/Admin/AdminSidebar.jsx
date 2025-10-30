@@ -28,7 +28,7 @@ const AdminSidebar = ({ activeMenu, onMenuChange }) => {
         { id: 'movies', label: 'Manage Movies', icon: Film },
         { id: 'users', label: 'Manage Users', icon: Users },
         { id: 'food', label: 'Manage Food', icon: Coffee },
-        { id: 'bookings', label: 'Manage Schedule', icon: Calendar },
+        { id: 'schedules', label: 'Manage Schedule', icon: Calendar },
         { id: 'transactions', label: 'Manage Transactions', icon: CircleDollarSign },
     ];
 

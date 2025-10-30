@@ -26,7 +26,12 @@ const FoodManagement = () => {
         setLoading(true);
         try {
             const response = await api.get('/api/admin/foods');
-            setFoods(response.data);
+            const foods = response.data.data || response.data || [];
+            const processedFoods = Array.isArray(foods) ? foods.map(food => ({
+                ...food,
+                is_available: Boolean(food.is_active === true || food.is_active === 1 || food.is_active === '1')
+            })) : [];
+            setFoods(processedFoods);
         } catch (error) {
             console.error('Failed to load foods:', error);
             setFoods([]);
@@ -37,7 +42,7 @@ const FoodManagement = () => {
     };
 
     const filterFoods = () => {
-        let filtered = foods;
+        let filtered = Array.isArray(foods) ? foods : [];
 
         // Search filter
         if (searchTerm) {
@@ -100,6 +105,45 @@ const FoodManagement = () => {
                 console.error('Failed to delete food:', error);
                 showToast('Failed to delete food item', 'error');
             }
+        }
+    };
+
+    const handleToggleAvailability = async (id, currentStatus) => {
+        try {
+            // Try the new endpoint first
+            let response;
+            try {
+                response = await api.patch(`/api/admin/foods/${id}/toggle-availability`, {
+                    is_active: !currentStatus
+                });
+            } catch (patchError) {
+                // Fallback to PUT if PATCH endpoint doesn't exist
+                const newAvailability = !currentStatus;
+                response = await api.put(`/api/admin/foods/${id}`, {
+                    is_active: newAvailability
+                });
+                console.log('PUT response:', response.data);
+            }
+            
+            showToast('Food availability updated successfully', 'success');
+            
+            // Update local state immediately for better UX
+            const newStatus = !currentStatus;
+            setFoods(prevFoods => 
+                prevFoods.map(food => 
+                    food.id === id 
+                        ? { ...food, is_available: newStatus, is_active: newStatus }
+                        : food
+                )
+            );
+            
+            console.log(`Food ${id} availability changed from ${currentStatus} to ${newStatus}`);
+            
+            // Reload from server to ensure consistency
+            setTimeout(() => loadFoods(), 500);
+        } catch (error) {
+            console.error('Failed to update food availability:', error);
+            showToast('Failed to update food availability', 'error');
         }
     };
 
@@ -199,14 +243,17 @@ const FoodManagement = () => {
                                 filteredFoods.map((food) => (
                                     <tr key={food.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <img
-                                                src={food.image ? `http://localhost:8000/storage/${food.image}` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNiAxNkgzMlYzMkgxNlYxNloiIGZpbGw9IiNEMUQ1REIiLz4KPC9zdmc+'}
-                                                alt={food.name}
-                                                className="w-12 h-12 rounded-lg object-cover"
-                                                onError={(e) => {
-                                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNiAxNkgzMlYzMkgxNlYxNloiIGZpbGw9IiNEMUQ1REIiLz4KPC9zdmc+';
-                                                }}
-                                            />
+                                            <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center overflow-hidden">
+                                                {food.image_url ? (
+                                                    <img
+                                                        src={food.image_url}
+                                                        alt={food.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="text-xs text-gray-500 text-center">No Image</div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="text-sm font-medium text-gray-900">{food.name}</div>
@@ -225,13 +272,17 @@ const FoodManagement = () => {
                                             Rp {parseInt(food.price || 0).toLocaleString('id-ID')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                food.is_available 
-                                                    ? 'bg-green-100 text-green-800' 
-                                                    : 'bg-red-100 text-red-800'
-                                            }`}>
-                                                {food.is_available ? 'Available' : 'Unavailable'}
-                                            </span>
+                                            <button
+                                                onClick={() => handleToggleAvailability(food.id, food.is_available)}
+                                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer hover:opacity-80 transition-opacity ${
+                                                    food.is_available === true
+                                                        ? 'bg-green-100 text-green-800' 
+                                                        : 'bg-red-100 text-red-800'
+                                                }`}
+                                                title="Click to toggle availability"
+                                            >
+                                                {food.is_available === true ? 'Available' : 'Unavailable'}
+                                            </button>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex space-x-2">

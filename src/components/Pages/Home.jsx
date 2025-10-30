@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus, Hamburger } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus, Hamburger, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Navbar from "../ui/MainNavbar";
@@ -43,20 +44,57 @@ const carouselMovies = [
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [comingSoonMovies, setComingSoonMovies] = useState([]);
+  const [carouselMovies, setCarouselMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [selectedTrailer, setSelectedTrailer] = useState(null);
 
   const fetchMovies = async () => {
     try {
       const response = await api.get('/api/movies');
-      const movies = response.data;
+      let movies = [];
       
-      setNowPlayingMovies(movies.filter(movie => movie.status === 'live_now'));
-      setComingSoonMovies(movies.filter(movie => movie.status === 'coming_soon'));
+      // Handle different response structures
+      if (Array.isArray(response.data)) {
+        movies = response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        movies = response.data.data;
+      } else {
+        console.warn('Unexpected API response structure:', response.data);
+        movies = [];
+      }
+      
+      setNowPlayingMovies(movies.filter(movie => movie && movie.status === 'live_now'));
+      setComingSoonMovies(movies.filter(movie => movie && movie.status === 'coming_soon'));
+      
+      // Set latest 6 movies for carousel
+      const latestMovies = movies.slice(-6).map(movie => ({
+        id: movie.id,
+        title: movie.name,
+        description: movie.description || `${movie.genre} movie featuring amazing storyline and characters.`,
+        backdrop: movie.image ? `http://localhost:8000/storage/${movie.image}` : banner1,
+        genre: movie.genre,
+        trailer_type: movie.trailer_type,
+        trailer_url: movie.trailer_url,
+        trailer_file: movie.trailer_file
+      }));
+      setCarouselMovies(latestMovies.length > 0 ? latestMovies : [
+        {
+          id: 1,
+          title: "Welcome to NexusVerse",
+          description: "Your premium cinema experience awaits. Discover amazing movies and unforgettable moments.",
+          backdrop: banner1,
+          genre: "Entertainment"
+        }
+      ]);
     } catch (error) {
       console.error('Failed to fetch movies:', error);
+      setNowPlayingMovies([]);
+      setComingSoonMovies([]);
     } finally {
       setLoading(false);
     }
@@ -80,23 +118,33 @@ export default function Home() {
 
     // Auto carousel
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselMovies.length);
+      setCurrentSlide((prev) => (prev + 1) % (carouselMovies.length || 1));
     }, 4000);
     
     return () => clearInterval(timer);
   }, []);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % carouselMovies.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + carouselMovies.length) % carouselMovies.length);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (carouselMovies.length || 1));
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + (carouselMovies.length || 1)) % (carouselMovies.length || 1));
+
+  const handleWatchTrailer = (movie) => {
+    if (movie.trailer_type === 'url' && movie.trailer_url) {
+      window.open(movie.trailer_url, '_blank');
+    } else if (movie.trailer_type === 'upload' && movie.trailer_file) {
+      setSelectedTrailer(movie);
+      setShowVideoModal(true);
+    }
+  };
 
   return (
     <div className="min-h-screen">
       <Navbar />
       
       {/* Hero Carousel Section */}
-      <section className="relative h-screen overflow-hidden pt-28 sm:pt-40">
-        <div className="relative h-full">
-          {carouselMovies.map((movie, index) => (
+      {(nowPlayingMovies.length > 0 || comingSoonMovies.length > 0) ? (
+        <section className="relative h-screen overflow-hidden pt-28 sm:pt-40">
+          <div className="relative h-full">
+            {carouselMovies.map((movie, index) => (
             <div
               key={movie.id}
               className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -114,10 +162,15 @@ export default function Home() {
                       <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-tight">{movie.title}</h1>
                       <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-300">{movie.genre}</p>
                       <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">{movie.description}</p>
-                      <button className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base">
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        Watch Trailer
-                      </button>
+                      {(movie.trailer_url || movie.trailer_file) && (
+                        <button 
+                          onClick={() => handleWatchTrailer(movie)}
+                          className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base"
+                        >
+                          <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                          Watch Trailer
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -127,19 +180,32 @@ export default function Home() {
         </div>
         
 
-        {/* Carousel Indicators */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {carouselMovies.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentSlide ? 'bg-white' : 'bg-white/50'
-              }`}
-            />
-          ))}
-        </div>
-      </section>
+          {/* Carousel Indicators */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            {carouselMovies.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  index === currentSlide ? 'bg-white' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="relative h-96 overflow-hidden pt-28 sm:pt-40 bg-gradient-to-r from-gray-800 to-gray-900">
+          <div className="relative h-full flex items-center justify-center">
+            <div className="text-center text-white">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Welcome to NexusVerse</h1>
+              <p className="text-lg sm:text-xl mb-8">Your premium cinema experience awaits</p>
+              <button className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                Explore Movies
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
       {/* Now Playing Section */}
       <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -153,9 +219,10 @@ export default function Home() {
               {nowPlayingMovies.map((movie, index) => (
                 <div 
                   key={movie.id} 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                   data-aos="fade-up"
                   data-aos-delay={index * 100}
+                  onClick={() => navigate(`/movies/${movie.id}`)}
                 >
                   <div className="relative">
                     <img
@@ -172,8 +239,14 @@ export default function Home() {
                     <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 line-clamp-2">{movie.name}</h3>
                     <p className="text-gray-600 mb-2 text-sm sm:text-base">{movie.genre}</p>
                     <p className="text-gray-500 text-xs sm:text-sm mb-4">{formatDuration(movie.duration)}</p>
-                    <button className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base">
-                      Book Now
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/movies/${movie.id}`);
+                      }}
+                      className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base"
+                    >
+                      View Details
                     </button>
                   </div>
                 </div>
@@ -201,9 +274,10 @@ export default function Home() {
               {comingSoonMovies.map((movie, index) => (
                 <div 
                   key={movie.id} 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                   data-aos="fade-up"
                   data-aos-delay={index * 100}
+                  onClick={() => navigate(`/movies/${movie.id}`)}
                 >
                   <div className="relative">
                     <img
@@ -220,8 +294,14 @@ export default function Home() {
                     <p className="text-gray-600 mb-2 text-sm sm:text-base">{movie.genre}</p>
                     <p className="text-gray-500 text-xs sm:text-sm mb-2">{formatDuration(movie.duration)}</p>
                     <p className="text-[#FFA500] font-semibold mb-4 text-sm sm:text-base">Release: {movie.release_date || 'TBA'}</p>
-                    <button className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:bg-gray-300 transition-colors text-sm sm:text-base">
-                      Watch Trailer
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/movies/${movie.id}`);
+                      }}
+                      className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base"
+                    >
+                      View Details
                     </button>
                   </div>
                 </div>
@@ -271,6 +351,28 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Video Modal for Carousel Trailers */}
+      {showVideoModal && selectedTrailer && (
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+          <div className="relative bg-white rounded-lg overflow-hidden max-w-4xl w-full max-h-[90vh]">
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition-opacity z-10"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <video
+              controls
+              autoPlay
+              className="w-full h-auto max-h-[80vh]"
+              src={`http://localhost:8000/storage/${selectedTrailer.trailer_file}`}
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

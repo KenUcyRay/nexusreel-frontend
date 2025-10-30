@@ -7,19 +7,27 @@ export const useAuth = () => {
 
     const checkAuth = useCallback(async () => {
         try {
-            const token = localStorage.getItem('auth_token');
+            const token = localStorage.getItem('token');
+            const savedUser = localStorage.getItem('user');
+            
             if (!token) {
                 setUser(null);
                 setLoading(false);
                 return;
             }
             
+            if (savedUser) {
+                setUser(JSON.parse(savedUser));
+            }
+            
             const response = await api.get('/api/user');
             setUser(response.data);
+            localStorage.setItem('user', JSON.stringify(response.data));
         } catch (error) {
             if (error.response?.status === 401) {
                 setUser(null);
-                localStorage.removeItem('auth_token');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
             }
         } finally {
             setLoading(false);
@@ -32,18 +40,20 @@ export const useAuth = () => {
 
     const login = async (credentials) => {
         const response = await api.post('/api/login', credentials);
-        setUser(response.data.user);
-        if (response.data.token) {
-            localStorage.setItem('auth_token', response.data.token);
+        if (response.data.success) {
+            setUser(response.data.user);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
         }
         return response.data;
     };
 
     const register = async (userData) => {
         const response = await api.post('/api/register', userData);
-        setUser(response.data.user);
-        if (response.data.token) {
-            localStorage.setItem('auth_token', response.data.token);
+        if (response.data.success) {
+            setUser(response.data.user);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
         }
         return response.data;
     };
@@ -53,7 +63,8 @@ export const useAuth = () => {
             await api.post('/api/logout');
         } finally {
             setUser(null);
-            localStorage.removeItem('auth_token');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
         }
     };
 

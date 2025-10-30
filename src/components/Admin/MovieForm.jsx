@@ -7,10 +7,17 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
         name: '',
         genre: '',
         duration: '',
-        status: 'coming_soon'
+        status: 'coming_soon',
+        description: '',
+        rating: '',
+        director: '',
+        production_team: '',
+        trailer_url: '',
+        trailer_type: 'url'
     });
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
+    const [trailerFile, setTrailerFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -20,7 +27,13 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                 name: movie.name || '',
                 genre: movie.genre || '',
                 duration: movie.duration || '',
-                status: movie.status || 'coming_soon'
+                status: movie.status || 'coming_soon',
+                description: movie.description || '',
+                rating: movie.rating || '',
+                director: movie.director || '',
+                production_team: movie.production_team || '',
+                trailer_url: movie.trailer_url || '',
+                trailer_type: movie.trailer_type || 'url'
             });
             if (movie.image) {
                 setImagePreview(`http://localhost:8000/storage/${movie.image}`);
@@ -46,13 +59,11 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file type
             if (!file.type.startsWith('image/')) {
                 showToast('Please select an image file', 'error');
                 return;
             }
             
-            // Validate file size (2MB)
             if (file.size > 2 * 1024 * 1024) {
                 showToast('Image size must be less than 2MB', 'error');
                 return;
@@ -60,12 +71,28 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
 
             setImageFile(file);
             
-            // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 setImagePreview(e.target.result);
             };
             reader.readAsDataURL(file);
+        }
+    };
+
+    const handleTrailerChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (!file.type.startsWith('video/')) {
+                showToast('Please select a video file', 'error');
+                return;
+            }
+            
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('Video size must be less than 50MB', 'error');
+                return;
+            }
+
+            setTrailerFile(file);
         }
     };
 
@@ -82,6 +109,18 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
         
         if (!formData.duration || formData.duration < 1) {
             newErrors.duration = 'Duration must be at least 1 minute';
+        }
+        
+        if (!formData.description.trim()) {
+            newErrors.description = 'Description is required';
+        }
+        
+        if (!formData.rating.trim()) {
+            newErrors.rating = 'Rating is required';
+        }
+        
+        if (!formData.director.trim()) {
+            newErrors.director = 'Director is required';
         }
         
         if (!movie && !imageFile) {
@@ -107,9 +146,22 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
             submitData.append('genre', formData.genre);
             submitData.append('duration', formData.duration);
             submitData.append('status', formData.status);
+            submitData.append('description', formData.description);
+            submitData.append('rating', formData.rating);
+            submitData.append('director', formData.director);
+            submitData.append('production_team', formData.production_team);
+            submitData.append('trailer_type', formData.trailer_type);
+            
+            if (formData.trailer_type === 'url') {
+                submitData.append('trailer_url', formData.trailer_url);
+            }
             
             if (imageFile) {
                 submitData.append('image', imageFile);
+            }
+            
+            if (trailerFile) {
+                submitData.append('trailer_file', trailerFile);
             }
 
             let response;
@@ -261,6 +313,163 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                             <option value="coming_soon">Coming Soon</option>
                             <option value="live_now">Live Now</option>
                         </select>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Description *
+                        </label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            rows="4"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="Enter movie description"
+                        />
+                        {errors.description && (
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.description}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Rating */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Rating *
+                        </label>
+                        <select
+                            name="rating"
+                            value={formData.rating}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                        >
+                            <option value="">Select Rating</option>
+                            <option value="G">G - General Audiences</option>
+                            <option value="PG">PG - Parental Guidance</option>
+                            <option value="PG-13">PG-13 - Parents Strongly Cautioned</option>
+                            <option value="R">R - Restricted</option>
+                            <option value="NC-17">NC-17 - Adults Only</option>
+                        </select>
+                        {errors.rating && (
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.rating}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Director */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Director *
+                        </label>
+                        <input
+                            type="text"
+                            name="director"
+                            value={formData.director}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="Enter director name"
+                        />
+                        {errors.director && (
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.director}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Production Team */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Production Team
+                        </label>
+                        <input
+                            type="text"
+                            name="production_team"
+                            value={formData.production_team}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                            placeholder="Enter production team"
+                        />
+                    </div>
+
+                    {/* Trailer */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Trailer
+                        </label>
+                        <div className="space-y-4">
+                            <div className="flex space-x-4">
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="trailer_type"
+                                        value="url"
+                                        checked={formData.trailer_type === 'url'}
+                                        onChange={handleInputChange}
+                                        className="mr-2"
+                                    />
+                                    URL
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="trailer_type"
+                                        value="upload"
+                                        checked={formData.trailer_type === 'upload'}
+                                        onChange={handleInputChange}
+                                        className="mr-2"
+                                    />
+                                    Upload Video
+                                </label>
+                            </div>
+                            
+                            {formData.trailer_type === 'url' ? (
+                                <input
+                                    type="url"
+                                    name="trailer_url"
+                                    value={formData.trailer_url}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                    placeholder="Enter trailer URL (YouTube, Vimeo, etc.)"
+                                />
+                            ) : (
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200 bg-gray-50">
+                                    <input
+                                        type="file"
+                                        accept="video/*"
+                                        onChange={handleTrailerChange}
+                                        className="hidden"
+                                        id="trailer-upload"
+                                    />
+                                    <label
+                                        htmlFor="trailer-upload"
+                                        className="cursor-pointer flex flex-col items-center"
+                                    >
+                                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                                            <Upload className="w-6 h-6 text-blue-600" />
+                                        </div>
+                                        <span className="text-sm font-medium text-gray-700 mb-1">
+                                            {trailerFile ? trailerFile.name : 'Click to upload trailer'}
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                            MP4, AVI, MOV up to 50MB
+                                        </span>
+                                    </label>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Image Upload */}

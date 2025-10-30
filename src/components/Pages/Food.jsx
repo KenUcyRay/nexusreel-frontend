@@ -15,10 +15,10 @@ export default function Food() {
   const fetchFoodItems = async () => {
     try {
       const response = await api.get('/api/foods');
-      // Handle both array response and object with data property
-      const foods = Array.isArray(response.data) ? response.data : response.data.data || [];
-      // Filter only available items
-      setFoodItems(foods.filter(item => item.is_available));
+      const foods = response.data.data || [];
+      // Filter only active/available items
+      const availableFoods = foods.filter(item => item.is_active);
+      setFoodItems(availableFoods);
     } catch (error) {
       console.error('Failed to fetch food items:', error);
       setFoodItems([]);
@@ -119,14 +119,11 @@ export default function Food() {
                         <p className="text-2xl font-bold text-gray-800 mb-4">Rp{parseInt(item.price || 0).toLocaleString()}</p>
                       </div>
                       <div className="w-24 h-20 rounded-lg ml-4 overflow-hidden bg-gray-200 flex items-center justify-center">
-                        {item.image ? (
+                        {item.image_url ? (
                           <img 
-                            src={`http://localhost:8000/storage/${item.image}`}
+                            src={item.image_url}
                             alt={item.name}
                             className="w-full h-full object-cover rounded-lg"
-                            onError={(e) => {
-                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA5NiA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNiAzMkg2MFY0OEgzNlYzMloiIGZpbGw9IiNEMUQ1REIiLz4KPC9zdmc+';
-                            }}
                           />
                         ) : (
                           <div className="text-xs text-gray-500 text-center">No Image</div>
@@ -136,14 +133,14 @@ export default function Food() {
                     
                     <button
                       onClick={() => addToCart(item)}
-                      disabled={!item.is_available}
+                      disabled={!item.is_active}
                       className={`w-full py-3 rounded-full font-semibold transition-colors ${
-                        item.is_available 
+                        item.is_active 
                           ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-[#FFA500] hover:text-[#FFA500]'
                           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}
                     >
-                      {item.is_available ? 'Tambah' : 'Tidak Tersedia'}
+                      {item.is_active ? 'Tambah' : 'Tidak Tersedia'}
                     </button>
                   </div>
                   ))}
