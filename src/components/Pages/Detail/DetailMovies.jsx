@@ -232,9 +232,12 @@ export default function DetailMovies() {
                       
                       <div className="text-right">
                         <div className="text-2xl font-bold text-gray-900 mb-2">
-                          Rp {schedule.price?.toLocaleString('id-ID') || '0'}
+                          Rp {parseInt(schedule.price || 0).toLocaleString('id-ID')}
                         </div>
-                        <button className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity">
+                        <button 
+                          onClick={() => navigate(`/booking/${schedule.id}`)}
+                          className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                        >
                           Book Now
                         </button>
                       </div>

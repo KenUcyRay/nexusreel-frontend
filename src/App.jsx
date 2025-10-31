@@ -6,6 +6,9 @@ import Home from "./components/Pages/Home"
 import Movies from "./components/Pages/Movies"
 import Food from "./components/Pages/Food"
 import Booking from "./components/Pages/Booking"
+import BookingFlow from "./components/Pages/Booking/BookingFlow"
+import Payment from "./components/Pages/Payment"
+import BookingSuccess from "./components/Pages/BookingSuccess"
 import About from "./components/Pages/About"
 import Footer from "./components/ui/Footer"
 import Navbar from "./components/ui/MainNavbar"
@@ -31,6 +34,9 @@ function AppContent() {
           <Route path="/movies/:id" element={<DetailMovies />} />
           <Route path="/food" element={<Food />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/booking/:scheduleId" element={<BookingFlow />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/booking-success" element={<BookingSuccess />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

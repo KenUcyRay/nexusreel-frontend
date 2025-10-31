@@ -57,8 +57,8 @@ const ScheduleForm = ({ schedule, movies, studios, onSave, onCancel, showToast }
       newErrors.show_time = 'Show time is required';
     }
     
-    if (!formData.price || formData.price < 1) {
-      newErrors.price = 'Price must be at least Rp 1';
+    if (!formData.price || formData.price < 1000) {
+      newErrors.price = 'Price must be at least Rp 1,000';
     }
 
     setErrors(newErrors);
@@ -236,7 +236,7 @@ const ScheduleForm = ({ schedule, movies, studios, onSave, onCancel, showToast }
                 name="price"
                 value={formData.price}
                 onChange={handleChange}
-                min="1"
+                min="1000"
                 step="1000"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                 placeholder="e.g. 50000"
