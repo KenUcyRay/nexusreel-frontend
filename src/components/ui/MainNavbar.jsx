@@ -7,6 +7,24 @@ import logo from '../../assets/logo.png';
 import homeIcon from '../../assets/home.png';
 import aboutIcon from '../../assets/about.png';
 
+// HistoryButton component for admin/owner
+function HistoryButton() {
+  const [hasTransactions, setHasTransactions] = useState(false);
+  
+  useEffect(() => {
+    const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
+    setHasTransactions(transactions.length > 0);
+  }, []);
+  
+  if (!hasTransactions) return null;
+  
+  return (
+    <a href="/history" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+      History
+    </a>
+  );
+}
+
 export default function MainNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,9 +34,16 @@ export default function MainNavbar() {
   const { user, logout } = useAuthContext();
 
   const handleLogout = async () => {
-    await logout();
-    setIsMenuOpen(false);
-    navigate('/login');
+    try {
+      await logout();
+      setIsMenuOpen(false);
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force logout even if API call fails
+      setIsMenuOpen(false);
+      navigate('/login', { replace: true });
+    }
   };
 
   const handleRoleNavigation = () => {
@@ -120,6 +145,16 @@ export default function MainNavbar() {
                             History
                           </a>
                         </>
+                      )}
+                      
+                      {(user.role === 'kasir') && (
+                        <a href="/history" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+                          History
+                        </a>
+                      )}
+                      
+                      {(user.role === 'admin' || user.role === 'owner') && (
+                        <HistoryButton />
                       )}
                       
                       {(user.role === 'admin' || user.role === 'owner' || user.role === 'kasir') && (

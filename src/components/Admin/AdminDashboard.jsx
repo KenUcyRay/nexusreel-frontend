@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
 import { Film, Users, DoorOpen, DollarSign, Coffee } from 'lucide-react';
 import RevenueChart from './RevenueChart';
+import SimpleLogout from '../SimpleLogout';
 import studioService from '../../services/studioService';
 
 const AdminDashboard = () => {
@@ -10,6 +11,7 @@ const AdminDashboard = () => {
         totalUsers: 0,
         totalStudios: 0,
         totalFoodItems: 0,
+        totalRevenue: 0,
     });
     
     const [user, setUser] = useState(null);
@@ -101,6 +103,12 @@ const AdminDashboard = () => {
             
             setRecentActivities(activities.slice(-5)); // Show last 5 activities
             
+            // Calculate revenue from localStorage
+            const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
+            const totalRevenue = transactions
+                .filter(t => t.payment_status === 'success')
+                .reduce((sum, t) => sum + parseInt(t.totalPrice || 0), 0);
+            
             // Try to fetch other dashboard data, fallback to counts only
             try {
                 const dashboardResponse = await api.get('/api/admin/dashboard');
@@ -109,7 +117,8 @@ const AdminDashboard = () => {
                     totalMovies,
                     totalUsers,
                     totalFoodItems,
-                    totalStudios
+                    totalStudios,
+                    totalRevenue
                 });
             } catch (dashboardError) {
                 // If dashboard endpoint doesn't exist, just set counts
@@ -118,7 +127,8 @@ const AdminDashboard = () => {
                     totalMovies,
                     totalUsers,
                     totalFoodItems,
-                    totalStudios
+                    totalStudios,
+                    totalRevenue
                 }));
             }
         } catch (error) {
@@ -131,7 +141,22 @@ const AdminDashboard = () => {
     }, [fetchDashboardData]);
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
+        <div className="min-h-screen bg-gray-100">
+            <nav className="bg-white shadow-sm border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16">
+                        <div className="flex items-center">
+                            <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <span className="text-sm text-gray-700">Welcome, {user?.name || 'Admin'}</span>
+                            <SimpleLogout />
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <div className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white overflow-hidden shadow rounded-lg">
                     <div className="p-5">
@@ -197,6 +222,25 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </div>
+            
+            {/* Revenue Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="p-5">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <DollarSign className="h-6 w-6 text-green-400" />
+                            </div>
+                            <div className="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
+                                    <dd className="text-lg font-medium text-gray-900">Rp {stats.totalRevenue.toLocaleString('id-ID')}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Revenue Chart */}
             <div className="mb-8">
@@ -233,6 +277,7 @@ const AdminDashboard = () => {
                     )}
                 </div>
             </div>
+        </div>
         </div>
     );
 };

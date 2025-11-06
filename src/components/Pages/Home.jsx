@@ -165,7 +165,7 @@ export default function Home() {
                       {(movie.trailer_url || movie.trailer_file) && (
                         <button 
                           onClick={() => handleWatchTrailer(movie)}
-                          className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base"
+                          className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base cursor-pointer"
                         >
                           <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                           Watch Trailer
@@ -244,7 +244,7 @@ export default function Home() {
                         e.stopPropagation();
                         navigate(`/movies/${movie.id}`);
                       }}
-                      className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base"
+                      className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base cursor-pointer"
                     >
                       View Details
                     </button>

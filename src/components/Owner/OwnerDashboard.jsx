@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
-import { TrendingUp, TrendingDown, Film, Coffee, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, Film, Coffee, DollarSign, Home, LogOut } from 'lucide-react';
 import SimpleLogout from '../SimpleLogout';
+import RevenueChart from '../Admin/RevenueChart';
 
 const OwnerDashboard = () => {
     const [reports, setReports] = useState({
@@ -22,8 +23,67 @@ const OwnerDashboard = () => {
 
     const fetchDashboardData = useCallback(async () => {
         try {
-            const response = await api.get('/api/owner/dashboard');
-            setReports(response.data);
+            // Get real revenue data from localStorage
+            const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
+            let totalIncome = 0;
+            let movieRevenue = 0;
+            let foodRevenue = 0;
+            const movieStats = {};
+            const foodStats = {};
+            
+            transactions.forEach(transaction => {
+                if (transaction.payment_status === 'success') {
+                    const amount = parseInt(transaction.totalPrice || 0);
+                    totalIncome += amount;
+                    
+                    if (transaction.type === 'food') {
+                        foodRevenue += amount;
+                        transaction.items?.forEach(item => {
+                            if (!foodStats[item.name]) {
+                                foodStats[item.name] = 0;
+                            }
+                            foodStats[item.name] += item.quantity;
+                        });
+                    } else {
+                        movieRevenue += amount;
+                        const movieName = transaction.schedule?.movie?.title || transaction.schedule?.movie?.name;
+                        if (movieName) {
+                            if (!movieStats[movieName]) {
+                                movieStats[movieName] = 0;
+                            }
+                            movieStats[movieName] += 1;
+                        }
+                    }
+                }
+            });
+            
+            // Convert to popular arrays
+            const popularMovies = Object.entries(movieStats)
+                .map(([title, bookings]) => ({ title, bookings }))
+                .sort((a, b) => b.bookings - a.bookings)
+                .slice(0, 5);
+                
+            const popularFoods = Object.entries(foodStats)
+                .map(([name, orders]) => ({ name, orders }))
+                .sort((a, b) => b.orders - a.orders)
+                .slice(0, 5);
+            
+            setReports({
+                totalIncome,
+                totalExpenses: Math.floor(totalIncome * 0.3), // Estimate 30% expenses
+                popularMovies,
+                popularFoods
+            });
+            
+            // Try to fetch from API as fallback
+            try {
+                const response = await api.get('/api/owner/dashboard');
+                if (response.data) {
+                    setReports(prev => ({ ...prev, ...response.data }));
+                }
+            } catch (apiError) {
+                // API not available, use localStorage data
+            }
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error);
         }
@@ -102,6 +162,11 @@ const OwnerDashboard = () => {
                     </div>
                 </div>
 
+                {/* Revenue Chart */}
+                <div className="mb-6">
+                    <RevenueChart />
+                </div>
+                
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="bg-white shadow rounded-lg p-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">

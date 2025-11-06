@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, User, Mail } from 'lucide-react';
+import { ArrowLeft, CreditCard, User, Mail, ShoppingCart } from 'lucide-react';
 import Navbar from "../ui/MainNavbar";
 import api from '../../utils/api';
 
-export default function Payment() {
+export default function FoodPayment() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -14,18 +14,17 @@ export default function Payment() {
     phone: ''
   });
 
-  const bookingData = location.state;
+  const orderData = location.state;
   
   // Check if user is cashier
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isCashier = user.role === 'kasir';
 
   useEffect(() => {
-    console.log('Booking data received in Payment:', bookingData);
-    if (!bookingData) {
-      navigate('/movies');
+    if (!orderData) {
+      navigate('/food');
     }
-  }, [bookingData, navigate]);
+  }, [orderData, navigate]);
 
   const handleInputChange = (e) => {
     setCustomerData({
@@ -36,55 +35,50 @@ export default function Payment() {
 
   const handlePayment = async () => {
     if (!customerData.name.trim()) {
-      alert('Please enter customer name');
+      alert('Please enter your full name');
       return;
     }
     
-    if (!isCashier && !customerData.email.trim()) {
+    if (!customerData.email.trim()) {
       alert('Please enter your email address');
       return;
     }
 
-    if (!bookingData?.schedule?.id || !bookingData?.totalPrice || !bookingData?.selectedSeats?.length) {
-      alert('Invalid booking data. Please try again.');
-      navigate(isCashier ? '/kasir/dashboard' : '/movies');
+    if (!orderData?.items?.length) {
+      alert('No items in order');
+      navigate('/food');
       return;
     }
 
     setLoading(true);
     try {
       const paymentData = {
-        amount: bookingData.totalPrice,
+        amount: orderData.totalPrice,
         customer_name: customerData.name,
-        seats: bookingData.selectedSeats,
-        ticket_count: bookingData.ticketCount,
-        schedule_id: bookingData.schedule.id
+        customer_email: customerData.email,
+        items: orderData.items.map(item => ({
+          food_id: item.id,
+          quantity: item.quantity,
+          price: parseInt(item.price)
+        }))
       };
-      
-      // Add email only for regular users
-      if (!isCashier) {
-        paymentData.customer_email = customerData.email;
-      }
 
-      const endpoint = isCashier ? '/api/kasir/payment' : '/api/payment';
-      const response = await api.post(endpoint, paymentData);
+      const response = await api.post('/api/food-payment', paymentData);
       const snapToken = response.data.snap_token;
-      
-      console.log('Backend response:', response.data);
-      console.log('Snap token:', snapToken);
       
       if (snapToken) {
         window.snap.pay(snapToken, {
           skipOrderSummary: true,
           onSuccess: function(result) {
-            console.log('Payment success:', result);
+            console.log('Food payment success:', result);
             // Save transaction to localStorage for history
             const transaction = {
-              ...bookingData,
+              ...orderData,
               ...result,
               order_id: response.data.order_id,
               payment_status: 'success',
-              payment_date: new Date().toISOString()
+              payment_date: new Date().toISOString(),
+              type: 'food'
             };
             
             // Save to localStorage
@@ -92,19 +86,20 @@ export default function Payment() {
             existingTransactions.push(transaction);
             localStorage.setItem('userTransactions', JSON.stringify(existingTransactions));
             
-            // Prevent default redirect and navigate manually
+            // Navigate to success page
             window.location.href = '/booking-success';
           },
           onPending: function(result) {
-            console.log('Payment pending:', result);
+            console.log('Food payment pending:', result);
             alert('Payment is pending. Please complete your payment.');
           },
           onError: function(result) {
-            console.log('Payment error:', result);
+            console.log('Food payment error:', result);
             alert('Payment failed. Please try again.');
           },
           onClose: function() {
-            console.log('Payment popup closed');
+            console.log('Food payment popup closed');
+            // Handle payment cancellation - stay on payment page
           }
         });
       } else {
@@ -118,7 +113,7 @@ export default function Payment() {
     }
   };
 
-  if (!bookingData) {
+  if (!orderData) {
     return null;
   }
 
@@ -149,7 +144,7 @@ export default function Payment() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <User className="w-4 h-4 inline mr-1" />
-                      {isCashier ? 'Customer Name *' : 'Full Name *'}
+                      Full Name *
                     </label>
                     <input
                       type="text"
@@ -161,37 +156,33 @@ export default function Payment() {
                     />
                   </div>
 
-                  {!isCashier && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Mail className="w-4 h-4 inline mr-1" />
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={customerData.email}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFA500] focus:border-[#FFA500]"
-                        required
-                      />
-                    </div>
-                  )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Mail className="w-4 h-4 inline mr-1" />
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={customerData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFA500] focus:border-[#FFA500]"
+                      required
+                    />
+                  </div>
 
-                  {!isCashier && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={customerData.phone}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFA500] focus:border-[#FFA500]"
-                      />
-                    </div>
-                  )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={customerData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFA500] focus:border-[#FFA500]"
+                    />
+                  </div>
                 </div>
 
                 <button
@@ -204,49 +195,32 @@ export default function Payment() {
               </form>
             </div>
 
-            {/* Booking Summary */}
+            {/* Order Summary */}
             <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Booking Summary</h3>
+              <div className="flex items-center mb-6">
+                <ShoppingCart className="w-6 h-6 text-[#FFA500] mr-3" />
+                <h3 className="text-xl font-bold text-gray-900">Order Summary</h3>
+              </div>
               
               <div className="space-y-4 mb-6">
-                <div>
-                  <p className="text-sm text-gray-600">Movie</p>
-                  <p className="font-semibold text-lg">{bookingData.schedule?.movie?.title || bookingData.schedule?.movie?.name}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Date</p>
-                    <p className="font-semibold">{new Date(bookingData.schedule?.show_date).toLocaleDateString('id-ID')}</p>
+                {orderData.items.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <div>
+                      <p className="font-semibold text-gray-900">{item.name}</p>
+                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                    </div>
+                    <p className="font-semibold text-gray-900">
+                      Rp {(item.price * item.quantity).toLocaleString('id-ID')}
+                    </p>
                   </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-600">Time</p>
-                    <p className="font-semibold">{bookingData.schedule?.show_time}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-600">Studio</p>
-                  <p className="font-semibold">{bookingData.schedule?.studio?.name || 'Studio'}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-600">Seats</p>
-                  <p className="font-semibold">{bookingData.selectedSeats?.join(', ')}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-600">Tickets</p>
-                  <p className="font-semibold">{bookingData.ticketCount} ticket(s)</p>
-                </div>
+                ))}
               </div>
               
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total Amount</span>
                   <span className="text-2xl font-bold text-[#FFA500]">
-                    Rp {parseInt(bookingData.totalPrice).toLocaleString('id-ID')}
+                    Rp {orderData.totalPrice.toLocaleString('id-ID')}
                   </span>
                 </div>
               </div>

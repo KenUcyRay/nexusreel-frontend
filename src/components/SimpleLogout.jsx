@@ -10,11 +10,11 @@ const SimpleLogout = () => {
 
     const handleLogout = () => {
         // Simple logout - just clear tokens and redirect
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem('token');
         localStorage.removeItem('user');
         showToast('Logged out successfully!', 'success');
         setTimeout(() => {
-            navigate('/login');
+            navigate('/login', { replace: true });
         }, 1500);
     };
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Trash2 } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from "../ui/MainNavbar";
 import api from '../../utils/api';
 
 export default function Food() {
+  const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [foodItems, setFoodItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,17 +29,29 @@ export default function Food() {
     }
   };
 
-  const addToCart = (item) => {
+  const addToCart = (item, quantity = 1) => {
     const existingItem = cart.find(cartItem => cartItem.id === item.id);
     if (existingItem) {
       setCart(cart.map(cartItem => 
         cartItem.id === item.id 
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          ? { ...cartItem, quantity: cartItem.quantity + quantity }
           : cartItem
       ));
     } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
+      setCart([...cart, { ...item, quantity }]);
     }
+  };
+
+  const updateCartQuantity = (itemId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(itemId);
+      return;
+    }
+    setCart(cart.map(cartItem => 
+      cartItem.id === itemId 
+        ? { ...cartItem, quantity: newQuantity }
+        : cartItem
+    ));
   };
 
   const removeFromCart = (itemId) => {
@@ -52,30 +66,20 @@ export default function Food() {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (cart.length === 0) return;
     
-    try {
-      const transactionData = {
-        customer_name: "Guest User", // In real app, get from auth
-        customer_email: "guest@example.com", // In real app, get from auth
-        items: cart.map(item => ({
-          food_id: item.id,
-          quantity: item.quantity,
-          price: item.price
-        }))
-      };
-      
-      const response = await api.post('/api/transactions/food', transactionData);
-      
-      if (response.data.success) {
-        setCart([]);
-        alert('Order placed successfully!');
-      }
-    } catch (error) {
-      console.error('Failed to create transaction:', error);
-      alert('Failed to place order. Please try again.');
-    }
+    const orderData = {
+      items: cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
+      totalPrice: getTotalPrice()
+    };
+    
+    navigate('/food-payment', { state: orderData });
   };
 
   return (
@@ -131,17 +135,37 @@ export default function Food() {
                       </div>
                     </div>
                     
-                    <button
-                      onClick={() => addToCart(item)}
-                      disabled={!item.is_active}
-                      className={`w-full py-3 rounded-full font-semibold transition-colors ${
-                        item.is_active 
-                          ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-[#FFA500] hover:text-[#FFA500]'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      {item.is_active ? 'Tambah' : 'Tidak Tersedia'}
-                    </button>
+                    {cart.find(cartItem => cartItem.id === item.id) ? (
+                      <div className="flex items-center justify-between bg-gray-50 rounded-full p-2">
+                        <button
+                          onClick={() => updateCartQuantity(item.id, cart.find(cartItem => cartItem.id === item.id).quantity - 1)}
+                          className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="mx-4 font-semibold">
+                          {cart.find(cartItem => cartItem.id === item.id)?.quantity || 0}
+                        </span>
+                        <button
+                          onClick={() => updateCartQuantity(item.id, cart.find(cartItem => cartItem.id === item.id).quantity + 1)}
+                          className="w-8 h-8 rounded-full bg-[#FFA500] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => addToCart(item)}
+                        disabled={!item.is_active}
+                        className={`w-full py-3 rounded-full font-semibold transition-colors ${
+                          item.is_active 
+                            ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-[#FFA500] hover:text-[#FFA500] cursor-pointer'
+                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {item.is_active ? 'Add' : 'Out Of Stock'}
+                      </button>
+                    )}
                   </div>
                   ))}
                 </div>
@@ -153,7 +177,7 @@ export default function Food() {
               <div className="bg-white rounded-xl shadow-lg p-6 sticky top-32">
                 <div className="flex items-center mb-6">
                   <ShoppingCart className="w-6 h-6 text-gray-600 mr-3" />
-                  <h2 className="text-xl font-bold text-gray-800">Keranjang Saya</h2>
+                  <h2 className="text-xl font-bold text-gray-800">Selected Item</h2>
                 </div>
 
                 {cart.length === 0 ? (
@@ -188,14 +212,14 @@ export default function Food() {
 
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-gray-600">{getTotalItems()} item dipilih</span>
+                    <span className="text-gray-600">{getTotalItems()} Picked Item</span>
                     <span className="text-2xl font-bold text-gray-800">Rp {getTotalPrice().toLocaleString()}</span>
                   </div>
                   
                   <button
                     onClick={handleCheckout}
                     disabled={cart.length === 0}
-                    className="w-full py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:text-black cursor-pointer"
                   >
                     Checkout
                   </button>

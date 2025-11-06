@@ -13,6 +13,10 @@ export default function BookingFlow() {
   const [ticketCount, setTicketCount] = useState(1);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Check if user is cashier
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isCashier = user.role === 'kasir';
 
   useEffect(() => {
     fetchScheduleDetails();
@@ -97,8 +101,8 @@ export default function BookingFlow() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="pt-32 flex justify-center items-center h-64">
+        {!isCashier && <Navbar />}
+        <div className={`${isCashier ? 'pt-8' : 'pt-32'} flex justify-center items-center h-64`}>
           <div className="text-gray-500">Loading booking details...</div>
         </div>
       </div>
@@ -108,15 +112,15 @@ export default function BookingFlow() {
   if (!schedule) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="pt-32 flex justify-center items-center h-64">
+        {!isCashier && <Navbar />}
+        <div className={`${isCashier ? 'pt-8' : 'pt-32'} flex justify-center items-center h-64`}>
           <div className="text-center">
             <p className="text-gray-500 mb-4">Schedule not found</p>
             <button 
-              onClick={() => navigate('/movies')}
+              onClick={() => navigate(isCashier ? '/kasir/dashboard' : '/movies')}
               className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-2 rounded-lg"
             >
-              Back to Movies
+              {isCashier ? 'Back to Dashboard' : 'Back to Movies'}
             </button>
           </div>
         </div>
@@ -126,9 +130,9 @@ export default function BookingFlow() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {!isCashier && <Navbar />}
       
-      <div className="pt-32 pb-16">
+      <div className={`${isCashier ? 'pt-8' : 'pt-32'} pb-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button

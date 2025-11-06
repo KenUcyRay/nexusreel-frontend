@@ -1,15 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const RevenueChart = ({ data = [] }) => {
-    // Sample data if no data provided
-    const chartData = data.length > 0 ? data : [
-        { month: 'Jan', revenue: 15000000 },
-        { month: 'Feb', revenue: 18000000 },
-        { month: 'Mar', revenue: 22000000 },
-        { month: 'Apr', revenue: 19000000 },
-        { month: 'May', revenue: 25000000 },
-        { month: 'Jun', revenue: 28000000 }
-    ];
+    const [chartData, setChartData] = useState([]);
+
+    useEffect(() => {
+        if (data.length > 0) {
+            setChartData(data);
+        } else {
+            // Get real data from localStorage
+            const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
+            const monthlyRevenue = {};
+            
+            // Process transactions
+            transactions.forEach(transaction => {
+                if (transaction.payment_status === 'success') {
+                    const date = new Date(transaction.payment_date || transaction.schedule?.show_date);
+                    const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                    
+                    if (!monthlyRevenue[monthKey]) {
+                        monthlyRevenue[monthKey] = 0;
+                    }
+                    monthlyRevenue[monthKey] += parseInt(transaction.totalPrice || 0);
+                }
+            });
+            
+            // Convert to chart format
+            const chartArray = Object.entries(monthlyRevenue)
+                .map(([month, revenue]) => ({ month, revenue }))
+                .sort((a, b) => new Date(a.month) - new Date(b.month))
+                .slice(-6); // Last 6 months
+            
+            // If no real data, use sample data
+            if (chartArray.length === 0) {
+                setChartData([
+                    { month: 'Jan', revenue: 15000000 },
+                    { month: 'Feb', revenue: 18000000 },
+                    { month: 'Mar', revenue: 22000000 },
+                    { month: 'Apr', revenue: 19000000 },
+                    { month: 'May', revenue: 25000000 },
+                    { month: 'Jun', revenue: 28000000 }
+                ]);
+            } else {
+                setChartData(chartArray);
+            }
+        }
+    }, [data]);
 
     const maxRevenue = Math.max(...chartData.map(item => item.revenue));
     

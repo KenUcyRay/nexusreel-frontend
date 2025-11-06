@@ -33,6 +33,10 @@ export default function Booking() {
   const [ticketCount, setTicketCount] = useState(1);
   const [seats, setSeats] = useState(generateSeats());
   const [selectedSeats, setSelectedSeats] = useState([]);
+  
+  // Check if user is cashier
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isCashier = user.role === 'kasir';
 
   useEffect(() => {
     fetchSchedules();
@@ -87,8 +91,8 @@ export default function Booking() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="pt-40 flex justify-center items-center h-64">
+        {!isCashier && <Navbar />}
+        <div className={`${isCashier ? 'pt-8' : 'pt-40'} flex justify-center items-center h-64`}>
           <div className="text-gray-500">Loading schedules...</div>
         </div>
       </div>
@@ -97,9 +101,9 @@ export default function Booking() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {!isCashier && <Navbar />}
       
-      <div className="pt-40 pb-16">
+      <div className={`${isCashier ? 'pt-8' : 'pt-40'} pb-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">Movie Schedules</h1>
           
@@ -146,7 +150,7 @@ export default function Booking() {
                       </div>
                       <button
                         onClick={() => handleScheduleSelect(schedule)}
-                        className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                        className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity cursor-pointer"
                       >
                         Book Now
                       </button>
