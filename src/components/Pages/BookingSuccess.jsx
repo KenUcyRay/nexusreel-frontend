@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Calendar, Clock, MapPin, Ticket, ShoppingCart } from 'lucide-react';
 import Navbar from "../ui/MainNavbar";
@@ -6,42 +6,43 @@ import Navbar from "../ui/MainNavbar";
 export default function BookingSuccess() {
   const location = useLocation();
   const navigate = useNavigate();
-  let bookingData = location.state;
+  // Remove this line as we'll use state instead
   
   // Check if user is cashier
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isCashier = user.role === 'kasir';
 
-  // Handle Midtrans redirect with URL parameters
+  const [successData, setSuccessData] = useState(null);
+
+  // Get booking data from sessionStorage
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const orderId = urlParams.get('order_id');
-    const statusCode = urlParams.get('status_code');
-    const transactionStatus = urlParams.get('transaction_status');
+    console.log('🔍 BookingSuccess - checking for data');
+    console.log('📦 Location state:', location.state);
     
-    if (orderId && statusCode && transactionStatus) {
-      // Find transaction by order_id in localStorage
-      const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
-      const transaction = transactions.find(t => t.order_id === orderId);
+    if (location.state) {
+      console.log('✅ Using location state data');
+      setSuccessData(location.state);
+    } else {
+      const sessionData = sessionStorage.getItem('bookingSuccess');
+      console.log('📱 SessionStorage data:', sessionData);
       
-      if (transaction) {
-        // Update transaction status
-        transaction.payment_status = transactionStatus === 'settlement' ? 'success' : transactionStatus;
-        localStorage.setItem('userTransactions', JSON.stringify(transactions));
-        
-        // Clear URL parameters and reload without them
-        window.history.replaceState({}, document.title, '/booking-success');
+      if (sessionData) {
+        try {
+          const parsed = JSON.parse(sessionData);
+          console.log('✅ Using sessionStorage data:', parsed);
+          setSuccessData(parsed);
+          sessionStorage.removeItem('bookingSuccess');
+        } catch (e) {
+          console.error('❌ Failed to parse sessionStorage data:', e);
+        }
+      } else {
+        console.log('❌ No booking data found');
       }
     }
-  }, [location.search]);
+  }, [location.state]);
 
-  // If no state, get latest transaction from localStorage
-  if (!bookingData) {
-    const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
-    if (transactions.length > 0) {
-      bookingData = transactions[transactions.length - 1]; // Get latest transaction
-    }
-  }
+  // Use successData consistently
+  const bookingData = successData;
 
   if (!bookingData) {
     return (
@@ -73,14 +74,14 @@ export default function BookingSuccess() {
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
             <p className="text-gray-600">
-              {bookingData.type === 'food' ? 'Your food order has been placed successfully' : 'Your movie tickets have been booked successfully'}
+              {bookingData?.type === 'food' ? 'Your food order has been placed successfully' : 'Your movie tickets have been booked successfully'}
             </p>
           </div>
 
           {/* Order Details */}
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {bookingData.type === 'food' ? 'Order Details' : 'Booking Details'}
+              {bookingData?.type === 'food' ? 'Order Details' : 'Booking Details'}
             </h2>
             
             {bookingData.type === 'food' ? (
@@ -218,38 +219,13 @@ export default function BookingSuccess() {
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {bookingData.type === 'food' ? (
-              <>
-                <button
-                  onClick={() => navigate(isCashier ? '/kasir/dashboard' : '/food')}
-                  className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                >
-                  {isCashier ? 'Back to Dashboard' : 'Buy Another Product'}
-                </button>
-                <button
-                  onClick={() => window.print()}
-                  className="bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
-                >
-                  Print Receipt
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => navigate(isCashier ? '/kasir/dashboard' : '/movies')}
-                  className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                >
-                  {isCashier ? 'Back to Dashboard' : 'Book Another Movie'}
-                </button>
-                <button
-                  onClick={() => window.print()}
-                  className="bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors"
-                >
-                  Print Ticket
-                </button>
-              </>
-            )}
+          <div className="flex justify-center">
+            <button
+              onClick={() => navigate(isCashier ? '/kasir/dashboard' : (bookingData.type === 'food' ? '/food' : '/movies'))}
+              className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            >
+              {isCashier ? 'Back to Dashboard' : (bookingData.type === 'food' ? 'Buy Another Product' : 'Book Another Movie')}
+            </button>
           </div>
         </div>
       </div>

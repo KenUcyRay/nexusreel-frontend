@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Shield, Lock, Eye, EyeOff, X } from 'lucide-react';
+import { User, Mail, Shield, Lock, Eye, EyeOff, X, Phone } from 'lucide-react';
 import api from '../../utils/api';
 
 const UserForm = ({ user, onClose, onSave, showToast }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        phone: '',
         password: '',
         password_confirmation: '',
         role: 'user'
@@ -20,6 +21,7 @@ const UserForm = ({ user, onClose, onSave, showToast }) => {
             setFormData({
                 name: user.name || '',
                 email: user.email || '',
+                phone: user.phone || '',
                 password: '',
                 password_confirmation: '',
                 role: user.role || 'user'
@@ -81,6 +83,7 @@ const UserForm = ({ user, onClose, onSave, showToast }) => {
             const submitData = {
                 name: formData.name,
                 email: formData.email,
+                phone: formData.phone,
                 role: formData.role
             };
 
@@ -123,7 +126,7 @@ const UserForm = ({ user, onClose, onSave, showToast }) => {
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                                <User className="w-5 h-5 text-grey" />
+                                <User className="w-5 h-5 text-gray-600" />
                             </div>
                             <h2 className="text-xl font-bold text-white">
                                 {user ? 'Edit User' : 'Add New User'}
@@ -131,7 +134,7 @@ const UserForm = ({ user, onClose, onSave, showToast }) => {
                         </div>
                         <button
                             onClick={onClose}
-                            className="text-red-000 hover:text-gray-200 p-1 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-200"
+                            className="text-white hover:text-gray-200 p-1 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-200"
                         >
                             <X className="w-6 h-6" />
                         </button>
@@ -177,6 +180,26 @@ const UserForm = ({ user, onClose, onSave, showToast }) => {
                             </div>
                             {errors.email && (
                                 <p className="text-red-500 text-sm mt-2">{errors.email}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Phone Number *
+                            </label>
+                            <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                    placeholder="Enter phone number"
+                                />
+                            </div>
+                            {errors.phone && (
+                                <p className="text-red-500 text-sm mt-2">{errors.phone}</p>
                             )}
                         </div>
 

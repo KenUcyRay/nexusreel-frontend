@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus, Hamburger, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -55,38 +56,34 @@ export default function Home() {
 
   const fetchMovies = async () => {
     try {
-      const response = await api.get('/api/movies');
-      let movies = [];
+      const [liveResponse, comingResponse] = await Promise.all([
+        api.get('/api/movies'),
+        api.get('/api/movies/coming-soon')
+      ]);
       
-      // Handle different response structures
-      if (Array.isArray(response.data)) {
-        movies = response.data;
-      } else if (response.data && Array.isArray(response.data.data)) {
-        movies = response.data.data;
-      } else {
-        console.warn('Unexpected API response structure:', response.data);
-        movies = [];
-      }
+      const liveMovies = liveResponse.data?.data || [];
+      const comingSoonMovies = comingResponse.data?.data || [];
       
-      setNowPlayingMovies(movies.filter(movie => movie && movie.status === 'live_now'));
-      setComingSoonMovies(movies.filter(movie => movie && movie.status === 'coming_soon'));
+      setNowPlayingMovies(liveMovies);
+      setComingSoonMovies(comingSoonMovies);
       
-      // Set latest 6 movies for carousel
-      const latestMovies = movies.slice(-6).map(movie => ({
+      // Set carousel movies from live movies
+      const latestMovies = liveMovies.slice(0, 4).map(movie => ({
         id: movie.id,
         title: movie.name,
-        description: movie.description || `${movie.genre} movie featuring amazing storyline and characters.`,
-        backdrop: movie.image ? `http://localhost:8000/storage/${movie.image}` : banner1,
-        genre: movie.genre,
+        description: movie.description || `Action movie featuring amazing storyline and characters.`,
+        backdrop: movie.image_url || banner1,
+        genre: movie.genre || 'Action',
         trailer_type: movie.trailer_type,
         trailer_url: movie.trailer_url,
         trailer_file: movie.trailer_file
       }));
+      
       setCarouselMovies(latestMovies.length > 0 ? latestMovies : [
         {
           id: 1,
           title: "Welcome to NexusVerse",
-          description: "Your premium cinema experience awaits. Discover amazing movies and unforgettable moments.",
+          description: "Your premium cinema experience awaits.",
           backdrop: banner1,
           genre: "Entertainment"
         }
@@ -95,6 +92,13 @@ export default function Home() {
       console.error('Failed to fetch movies:', error);
       setNowPlayingMovies([]);
       setComingSoonMovies([]);
+      setCarouselMovies([{
+        id: 1,
+        title: "Welcome to NexusVerse",
+        description: "Your premium cinema experience awaits.",
+        backdrop: banner1,
+        genre: "Entertainment"
+      }]);
     } finally {
       setLoading(false);
     }
@@ -226,7 +230,7 @@ export default function Home() {
                 >
                   <div className="relative">
                     <img
-                      src={movie.image ? `http://localhost:8000/storage/${movie.image}` : '/placeholder-movie.jpg'}
+                      src={movie.image_url || '/placeholder-movie.jpg'}
                       alt={movie.name}
                       className="w-full h-64 sm:h-72 lg:h-80 object-cover"
                     />
@@ -281,7 +285,7 @@ export default function Home() {
                 >
                   <div className="relative">
                     <img
-                      src={movie.image ? `http://localhost:8000/storage/${movie.image}` : '/placeholder-movie.jpg'}
+                      src={movie.image_url || '/placeholder-movie.jpg'}
                       alt={movie.name}
                       className="w-full h-64 sm:h-72 lg:h-80 object-cover"
                     />

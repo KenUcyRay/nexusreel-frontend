@@ -118,14 +118,19 @@ const StudioForm = ({ studio, onSave, onCancel, showToast }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Studio Name *
               </label>
-              <input
-                type="text"
+              <select
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-                placeholder="Enter studio name"
-              />
+              >
+                <option value="">Select Studio</option>
+                <option value="Studio 1">Studio 1</option>
+                <option value="Studio 2">Studio 2</option>
+                <option value="Studio 3">Studio 3</option>
+                <option value="Studio 4">Studio 4</option>
+                <option value="Studio 5">Studio 5</option>
+              </select>
               {errors.name && (
                 <p className="text-red-500 text-sm mt-2 flex items-center">
                   <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">

@@ -139,7 +139,7 @@ const ScheduleForm = ({ schedule, movies, studios, onSave, onCancel, showToast }
                 <option value="">Select Movie</option>
                 {Array.isArray(movies) ? movies.map(movie => (
                   <option key={movie.id} value={movie.id}>
-                    {movie.name} ({movie.genre})
+                    {movie.name}
                   </option>
                 )) : null}
               </select>

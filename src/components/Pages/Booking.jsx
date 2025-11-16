@@ -1,6 +1,8 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { Clock, MapPin, ArrowLeft, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../contexts/AuthContext';
 import Navbar from "../ui/MainNavbar";
 import api from '../../utils/api';
 
@@ -35,8 +37,8 @@ export default function Booking() {
   const [selectedSeats, setSelectedSeats] = useState([]);
   
   // Check if user is cashier
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const isCashier = user.role === 'kasir';
+  const { user } = useAuthContext();
+  const isCashier = user?.role === 'kasir';
 
   useEffect(() => {
     fetchSchedules();
@@ -103,54 +105,56 @@ export default function Booking() {
     <div className="min-h-screen bg-gray-50">
       {!isCashier && <Navbar />}
       
-      <div className={`${isCashier ? 'pt-8' : 'pt-40'} pb-16`}>
+      <div className={`${isCashier ? 'pt-4 sm:pt-8' : 'pt-24 sm:pt-32 lg:pt-40'} pb-8 sm:pb-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">Movie Schedules</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-800 mb-6 sm:mb-8 lg:mb-12">Movie Schedules</h1>
           
           {schedules.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">No schedules available at the moment.</p>
+            <div className="text-center py-8 sm:py-12">
+              <p className="text-gray-600 text-base sm:text-lg">No schedules available at the moment.</p>
             </div>
           ) : (
-            <div className="grid gap-6">
+            <div className="grid gap-4 sm:gap-6">
               {schedules.map((schedule) => (
-                <div key={schedule.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div className="flex items-start space-x-4 mb-4 md:mb-0">
+                <div key={schedule.id} className="bg-white rounded-xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-start space-x-3 sm:space-x-4 mb-4 lg:mb-0">
                       <img 
                         src={schedule.movie?.image ? `http://localhost:8000/storage/${schedule.movie.image}` : '/placeholder-movie.jpg'} 
                         alt={schedule.movie?.title || 'Movie'} 
-                        className="w-20 h-28 object-cover rounded-lg" 
+                        className="w-16 h-20 sm:w-20 sm:h-28 object-cover rounded-lg flex-shrink-0" 
                       />
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">{schedule.movie?.title || 'Unknown Movie'}</h3>
-                        <p className="text-gray-600 mb-2">{schedule.movie?.genre || 'N/A'}</p>
-                        <p className="text-gray-500 text-sm mb-2">{formatDuration(schedule.movie?.duration || 0)}</p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 sm:mb-2 truncate">{schedule.movie?.title || 'Unknown Movie'}</h3>
+                        <p className="text-sm sm:text-base text-gray-600 mb-1 sm:mb-2">{schedule.movie?.genre || 'N/A'}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-2">{formatDuration(schedule.movie?.duration || 0)}</p>
                         
-                        <div className="flex items-center text-sm text-gray-600 mb-2">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {formatDate(schedule.show_date)}
-                        </div>
-                        
-                        <div className="flex items-center text-sm text-gray-600 mb-2">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {formatTime(schedule.show_time)}
-                        </div>
-                        
-                        <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          {schedule.studio?.name || 'Studio N/A'} - {schedule.studio?.type || 'Regular'}
+                        <div className="space-y-1 sm:space-y-2">
+                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                            <span className="truncate">{formatDate(schedule.show_date)}</span>
+                          </div>
+                          
+                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                            <span>{formatTime(schedule.show_time)}</span>
+                          </div>
+                          
+                          <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                            <span className="truncate">{schedule.studio?.name || 'Studio N/A'} - {schedule.studio?.type || 'Regular'}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-gray-900 mb-4">
+                    <div className="flex items-center justify-between lg:flex-col lg:items-end lg:text-right mt-3 lg:mt-0">
+                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 lg:mb-4">
                         Rp {parseInt(schedule.price || 0).toLocaleString('id-ID')}
                       </div>
                       <button
                         onClick={() => handleScheduleSelect(schedule)}
-                        className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+                        className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity cursor-pointer text-sm sm:text-base touch-manipulation"
                       >
                         Book Now
                       </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Film, MapPin, Phone, Mail, Clock, Facebook, Twitter, Instagram, Youtube, ChevronRight, Star, Ticket, Heart } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
@@ -143,7 +143,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <style jsx>{`
+        <style>{`
           @keyframes slide {
             0% {
               transform: translateX(0);

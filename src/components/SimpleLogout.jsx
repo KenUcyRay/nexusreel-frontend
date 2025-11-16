@@ -1,51 +1,24 @@
 import React from 'react';
+import { useAuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Home } from 'lucide-react';
-import Toast from './ui/Toast';
-import { useToast } from '../hooks/useToast';
+import { LogOut } from 'lucide-react';
 
-const SimpleLogout = () => {
-    const navigate = useNavigate();
-    const { toast, showToast, hideToast } = useToast();
+export default function SimpleLogout() {
+  const { logout } = useAuthContext();
+  const navigate = useNavigate();
 
-    const handleLogout = () => {
-        // Simple logout - just clear tokens and redirect
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        showToast('Logged out successfully!', 'success');
-        setTimeout(() => {
-            navigate('/login', { replace: true });
-        }, 1500);
-    };
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
-    const handleBackToWebsite = () => {
-        navigate('/home');
-    };
-
-    return (
-        <div className="flex items-center space-x-4">
-            <button
-                onClick={handleBackToWebsite}
-                className="flex items-center bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-4 py-2 rounded-md text-sm hover:opacity-90 transition-opacity"
-            >
-                <Home className="w-4 h-4 mr-2" />
-                Back to Website
-            </button>
-            <button
-                onClick={handleLogout}
-                className="flex items-center bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-4 py-2 rounded-md text-sm hover:opacity-90 transition-opacity"
-            >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-            </button>
-            <Toast
-                message={toast.message}
-                type={toast.type}
-                isVisible={toast.isVisible}
-                onClose={hideToast}
-            />
-        </div>
-    );
-};
-
-export default SimpleLogout;
+  return (
+    <button
+      onClick={handleLogout}
+      className="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+    >
+      <LogOut className="w-4 h-4 mr-2" />
+      Logout
+    </button>
+  );
+}

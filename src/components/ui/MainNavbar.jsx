@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, User, Film, MapPin, Calendar, Hamburger, LogOut } from 'lucide-react';
+import { Menu, User, Film, MapPin, Calendar, LogOut } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
 import api from '../../utils/api';
@@ -7,17 +7,8 @@ import logo from '../../assets/logo.png';
 import homeIcon from '../../assets/home.png';
 import aboutIcon from '../../assets/about.png';
 
-// HistoryButton component for admin/owner
+// HistoryButton component for admin/owner - always show
 function HistoryButton() {
-  const [hasTransactions, setHasTransactions] = useState(false);
-  
-  useEffect(() => {
-    const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
-    setHasTransactions(transactions.length > 0);
-  }, []);
-  
-  if (!hasTransactions) return null;
-  
   return (
     <a href="/history" className="block px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
       History
@@ -196,12 +187,15 @@ export default function MainNavbar() {
           isScrolled ? 'py-3' : 'py-4'
         }`}>
           {/* Logo - visible when scrolled */}
-          <div className={`absolute left-4 flex items-center space-x-2 transition-all duration-300 ${
-            isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
+          <a 
+            href="/" 
+            className={`absolute left-4 flex items-center space-x-2 transition-all duration-300 hover:opacity-80 ${
+              isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
             <img src={logo} alt="Logo" className="w-7 h-7" />
             <span className="text-lg font-bold text-[#FFA500] hidden sm:block">NexusVerse</span>
-          </div>
+          </a>
 
           {/* Center menu - card style */}
           <div className={`flex items-center transition-all duration-300 overflow-x-auto ${
@@ -215,7 +209,7 @@ export default function MainNavbar() {
               className={`flex items-center space-x-1 sm:space-x-2 text-black hover:text-[#FFA500] transition-all font-medium whitespace-nowrap ${
                 isScrolled 
                   ? `py-2 border-b-2 ${location.pathname === '/movies' ? 'border-[#FFA500]' : 'border-transparent hover:border-gray-700'}` 
-                  : 'py-3 sm:py-4 px-3 sm:px-6 border-r border-gray-200'
+                  : 'py-3 sm:py-4 px-3 sm:px-6'
               }`}
             >
               <Film className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -224,21 +218,7 @@ export default function MainNavbar() {
                 {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Films now showing and coming soon</span>}
               </div>
             </a>
-            <a 
-              href="/food" 
-              style={{color: location.pathname === '/food' ? '#FFA500 !important' : 'black !important'}}
-              className={`flex items-center space-x-1 sm:space-x-2 text-black hover:text-[#FFA500] transition-all font-medium whitespace-nowrap ${
-                isScrolled 
-                  ? `py-2 border-b-2 ${location.pathname === '/food' ? 'border-[#FFA500]' : 'border-transparent hover:border-gray-700'}` 
-                  : 'py-3 sm:py-4 px-3 sm:px-6 border-r border-gray-200'
-              }`}
-            >
-              <Hamburger className="w-4 h-4 sm:w-5 sm:h-5" />
-              <div className="flex flex-col">
-                <span className="font-semibold text-xs sm:text-sm">Foods</span>
-                {!isScrolled && <span className="text-xs text-gray-500 hidden sm:block">Enjoy your movie with NexFood</span>}
-              </div>
-            </a>
+
             <a 
               href="/booking" 
               style={{color: location.pathname === '/booking' ? '#FFA500 !important' : 'black !important'}}

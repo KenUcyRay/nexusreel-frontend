@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
-import { AuthProvider } from "./contexts/AuthContext"
+import { AuthProvider, useAuthContext } from "./contexts/AuthContext"
+import { CartProvider } from "./contexts/CartContext"
 import Login from "./components/Auth/Login"
 import Register from "./components/Auth/Register"
 import Home from "./components/Pages/Home"
 import Movies from "./components/Pages/Movies"
-import Food from "./components/Pages/Food"
 import Booking from "./components/Pages/Booking"
 import BookingFlow from "./components/Pages/Booking/BookingFlow"
 import Payment from "./components/Pages/Payment"
@@ -18,42 +18,60 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import AdminLayout from "./components/Admin/AdminLayout"
 import OwnerDashboard from "./components/Owner/OwnerDashboard"
 import CashierDashboard from "./components/Cashier/CashierDashboard"
+import CashierBooking from "./components/Cashier/CashierBooking"
+import CashierBookingFlow from "./components/Cashier/CashierBookingFlow"
+import CashierHistory from "./components/Cashier/CashierHistory"
+import CashierSuccess from "./components/Cashier/CashierSuccess"
 import DetailMovies from "./components/Pages/Detail/DetailMovies"
 import Unauthorized from "./components/Pages/Unauthorized"
 import NotFound from "./components/Pages/NotFound"
-import FoodPayment from "./components/Pages/FoodPayment"
 
 function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
   
   // Check if user is cashier
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const isCashier = user.role === 'kasir';
+  const { user } = useAuthContext();
+  const isCashier = user?.role === 'kasir';
   
-  // Hide navbar/footer for cashier on booking pages
-  const isBookingPage = location.pathname.startsWith('/booking') || location.pathname === '/payment' || location.pathname === '/food-payment' || location.pathname === '/booking-success' || location.pathname.startsWith('/kasir/');
-  const hideNavFooter = isCashier && isBookingPage;
+  // Hide navbar/footer for specific pages
+  const isBookingPage = location.pathname.startsWith('/booking') || location.pathname === '/payment' || location.pathname === '/booking-success';
+  const isCashierPage = location.pathname.startsWith('/kasir/');
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isOwnerDashboard = location.pathname === '/owner/dashboard';
+  const hideNavFooter = isOwnerDashboard || isCashierPage || (isCashier && isBookingPage);
 
   return (
     <div className="flex flex-col min-h-screen">
+      {!isAdminPage && !hideNavFooter && !isAuthPage && <Navbar />}
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/movies/:id" element={<DetailMovies />} />
-          <Route path="/food" element={<Food />} />
-          <Route path="/food-payment" element={<FoodPayment />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/booking/:scheduleId" element={<BookingFlow />} />
+
+          <Route path="/booking" element={
+            <ProtectedRoute>
+              <Booking />
+            </ProtectedRoute>
+          } />
+          <Route path="/booking/:scheduleId" element={
+            <ProtectedRoute>
+              <BookingFlow />
+            </ProtectedRoute>
+          } />
           <Route path="/payment" element={<Payment />} />
           <Route path="/booking-success" element={<BookingSuccess />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          <Route path="/history" element={<History />} />
+          <Route path="/history" element={
+            <ProtectedRoute>
+              <History />
+            </ProtectedRoute>
+          } />
           <Route path="/profile" element={
             <ProtectedRoute roles={['user']}>
               <Profile />
@@ -74,9 +92,25 @@ function AppContent() {
               <CashierDashboard />
             </ProtectedRoute>
           } />
+          <Route path="/kasir/booking" element={
+            <ProtectedRoute roles={['kasir']}>
+              <CashierBooking />
+            </ProtectedRoute>
+          } />
+          <Route path="/kasir/booking/:scheduleId" element={
+            <ProtectedRoute roles={['kasir']}>
+              <CashierBookingFlow />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/kasir/history" element={
+            <ProtectedRoute roles={['kasir']}>
+              <CashierHistory />
+            </ProtectedRoute>
+          } />
           <Route path="/kasir/success" element={
             <ProtectedRoute roles={['kasir']}>
-              <BookingSuccess />
+              <CashierSuccess />
             </ProtectedRoute>
           } />
           <Route path="/unauthorized" element={<Unauthorized />} />
@@ -84,18 +118,20 @@ function AppContent() {
         </Routes>
       </div>
 
-      {!isAdminPage && !hideNavFooter && <Footer />}
+      {!isAdminPage && !hideNavFooter && !isAuthPage && <Footer />}
     </div>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
+    </Router>
   )
 }
 

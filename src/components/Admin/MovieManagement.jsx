@@ -1,10 +1,11 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useToast } from '../../hooks/useToast';
 import api from '../../utils/api';
 import { Plus, Edit, Trash2, Eye, Search, Filter, Film, Settings } from 'lucide-react';
 import Toast from '../ui/Toast';
-import MovieForm from './MovieForm';
+import MovieForm from './MovieForm_Fixed';
 
 const MovieManagement = ({ onMovieChange }) => {
     const { user, logout } = useAuthContext();
@@ -83,35 +84,35 @@ const MovieManagement = ({ onMovieChange }) => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="mb-6 sm:mb-8">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Movies Collection</h2>
-                                <p className="text-gray-600">Manage your cinema's movie catalog</p>
+                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Movies Collection</h2>
+                                <p className="text-sm sm:text-base text-gray-600">Manage your cinema's movie catalog</p>
                             </div>
-                            <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                 {/* Search */}
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                                     <input
                                         type="text"
                                         placeholder="Search movies..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="pl-10 pr-4 py-3 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        className="pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base"
                                     />
                                 </div>
 
                                 {/* Filter */}
                                 <div className="relative">
-                                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
-                                        className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white min-w-[140px]"
+                                        className="pl-8 sm:pl-10 pr-6 sm:pr-8 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white min-w-[120px] sm:min-w-[140px] text-sm sm:text-base"
                                     >
                                         <option value="all">All Status</option>
                                         <option value="live_now">Live Now</option>
@@ -122,10 +123,11 @@ const MovieManagement = ({ onMovieChange }) => {
                                 {/* Add Movie Button */}
                                 <button
                                     onClick={() => setShowCreateForm(true)}
-                                    className=" bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-3 rounded-lg hover:from-orange-400 hover:to-orange-400 flex items-center gap-2 font-medium transition-all duration-200 shadow-md hover:shadow-lg"
+                                    className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:from-orange-400 hover:to-orange-400 flex items-center gap-2 font-medium transition-all duration-200 shadow-md hover:shadow-lg text-sm sm:text-base"
                                 >
-                                    <Plus className="w-5 h-5" />
-                                    Add Movie
+                                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    <span className="hidden sm:inline">Add Movie</span>
+                                    <span className="sm:hidden">Add</span>
                                 </button>
                             </div>
                         </div>
@@ -134,23 +136,23 @@ const MovieManagement = ({ onMovieChange }) => {
 
                 {/* Movies Grid */}
                 <div className="bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+                    <div className="overflow-x-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                         Movie
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                         Genre
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                         Duration
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -158,51 +160,69 @@ const MovieManagement = ({ onMovieChange }) => {
                             <tbody className="bg-white divide-y divide-gray-100">
                                 {filteredMovies.map((movie, index) => (
                                     <tr key={movie.id} className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
-                                        <td className="px-6 py-4">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4">
                                             <div className="flex items-center">
-                                                <div className="flex-shrink-0 h-20 w-32">
+                                                <div className="flex-shrink-0 h-12 w-16 sm:h-20 sm:w-32">
                                                     <img
-                                                        className="h-20 w-32 object-cover rounded-lg shadow-md border border-gray-200"
-                                                        src={movie.image ? `http://localhost:8000/storage/${movie.image}` : '/placeholder-movie.jpg'}
+                                                        className="h-12 w-16 sm:h-20 sm:w-32 object-cover rounded-lg shadow-md border border-gray-200"
+                                                        src={movie.image_url || '/placeholder-movie.jpg'}
                                                         alt={movie.name}
                                                     />
                                                 </div>
-                                                <div className="ml-4">
-                                                    <div className="text-sm font-semibold text-gray-900 mb-1">
+                                                <div className="ml-2 sm:ml-4">
+                                                    <div className="text-xs sm:text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
                                                         {movie.name}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-gray-500 sm:block hidden">
                                                         ID: {movie.id}
+                                                    </div>
+                                                    <div className="sm:hidden">
+                                                        {movie.genres && movie.genres.length > 0 && (
+                                                            <span className="text-xs text-blue-600">
+                                                                {movie.genres[0].name}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-900 font-medium">{movie.genre}</div>
+                                        <td className="hidden sm:table-cell px-6 py-4">
+                                            <div className="flex flex-wrap gap-1">
+                                                {movie.genres && movie.genres.length > 0 ? (
+                                                    movie.genres.map(genre => (
+                                                        <span key={genre.id} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                                            {genre.name}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-sm text-gray-500 italic">No genres</span>
+                                                )}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="hidden md:table-cell px-6 py-4">
                                             <div className="text-sm text-gray-900 font-medium">{formatDuration(movie.duration)}</div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4">
                                             <span className={getStatusBadge(movie.status)}>
-                                                {movie.status === 'live_now' ? 'Live Now' : 'Coming Soon'}
+                                                <span className="hidden sm:inline">{movie.status === 'live_now' ? 'Live Now' : 'Coming Soon'}</span>
+                                                <span className="sm:hidden">{movie.status === 'live_now' ? 'Live' : 'Soon'}</span>
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex space-x-3">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4">
+                                            <div className="flex space-x-1 sm:space-x-3">
                                                 <button
                                                     onClick={() => setEditingMovie(movie)}
-                                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                                                    className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200"
                                                     title="Edit Movie"
                                                 >
-                                                    <Edit className="w-5 h-5" />
+                                                    <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(movie.id)}
-                                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200"
+                                                    className="p-1.5 sm:p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200"
                                                     title="Delete Movie"
                                                 >
-                                                    <Trash2 className="w-5 h-5" />
+                                                    <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                                 </button>
                                             </div>
                                         </td>

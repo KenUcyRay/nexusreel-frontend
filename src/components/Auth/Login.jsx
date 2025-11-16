@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, User, Home } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, Home, Phone } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import loginImage from '../../assets/login.png';
 import Toast from '../ui/Toast';
@@ -8,9 +8,10 @@ import { useToast } from '../../hooks/useToast';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
+  const [loginField, setLoginField] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginType, setLoginType] = useState('email');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthContext();
@@ -24,17 +25,15 @@ export default function Login() {
     
     try {
       const credentials = {
-        email,
-        password
+        [loginType]: loginField,
+        password,
+        remember: rememberMe
       };
       
-      console.log('Attempting login with:', credentials);
-      
       const result = await login(credentials);
-      if (result.success && result.user) {
+      if (result && result.success && result.user) {
         showToast('Login successful! Welcome back.', 'success');
         setTimeout(() => {
-          // Navigate based on user role
           if (result.user.role === 'admin') {
             navigate('/admin/dashboard');
           } else if (result.user.role === 'owner') {
@@ -46,10 +45,11 @@ export default function Login() {
           }
         }, 1500);
       } else {
-        setError(result.message || 'Login failed');
+        setError(result?.message || 'Login failed');
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Login failed');
+      const errorMessage = error?.response?.data?.message || error?.message || 'Login failed';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +57,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#FFD700] to-[#FFA500]">
-      {/* Back to Website Button */}
       <div className="absolute top-4 right-4 z-10">
         <button
           onClick={() => navigate('/home')}
@@ -87,17 +86,37 @@ export default function Login() {
 
             <form className="space-y-2.5 sm:space-y-3" onSubmit={handleSubmit}>
               <div>
+                <div className="flex gap-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setLoginType('email')}
+                    className={`flex-1 py-1 px-2 text-xs rounded ${loginType === 'email' ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white' : 'bg-gray-200 text-gray-700'}`}
+                  >
+                    Email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLoginType('phone')}
+                    className={`flex-1 py-1 px-2 text-xs rounded ${loginType === 'phone' ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white' : 'bg-gray-200 text-gray-700'}`}
+                  >
+                    Phone
+                  </button>
+                </div>
                 <label className="block text-gray-700 font-medium mb-1 text-xs sm:text-sm">
-                  Email
+                  {loginType === 'email' ? 'Email' : 'Phone Number'}
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  {loginType === 'email' ? (
+                    <Mail className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  ) : (
+                    <Phone className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  )}
                   <input
-                    type="email"
-                    placeholder="Enter your email"
+                    type={loginType === 'email' ? 'email' : 'tel'}
+                    placeholder={loginType === 'email' ? 'Enter your email' : 'Enter your phone number'}
                     className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-300 outline-none text-xs sm:text-sm"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={loginField}
+                    onChange={(e) => setLoginField(e.target.value)}
                     required
                   />
                 </div>
@@ -173,9 +192,9 @@ export default function Login() {
       </div>
       
       <Toast
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.isVisible}
+        message={toast?.message || ''}
+        type={toast?.type || 'info'}
+        isVisible={toast?.isVisible || false}
         onClose={hideToast}
       />
     </div>

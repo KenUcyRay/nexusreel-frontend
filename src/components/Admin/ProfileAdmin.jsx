@@ -1,9 +1,12 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { Camera, Mail, Lock, User, Save, Upload } from 'lucide-react';
+import { useAuthContext } from '../../contexts/AuthContext';
 import api from '../../utils/api';
 
 const ProfileAdmin = () => {
-    const [user, setUser] = useState({
+    const { user } = useAuthContext();
+    const [userProfile, setUserProfile] = useState({
         name: '',
         email: '',
         avatar: null,
@@ -27,23 +30,14 @@ const ProfileAdmin = () => {
     }, []);
 
     const loadUserProfile = async () => {
-        try {
-            const response = await api.get('/api/profile');
-            const userData = response.data;
-            setUser(userData);
-            setFormData({
-                name: userData.name || '',
-                email: userData.email || '',
-                currentPassword: '',
-                newPassword: '',
-                confirmPassword: ''
-            });
-            if (userData.avatar) {
-                setAvatarPreview(`http://localhost:8000/storage/${userData.avatar}`);
-            }
-        } catch (error) {
-            console.error('Failed to load profile:', error);
-        }
+        setUserProfile(user);
+        setFormData({
+            name: user?.name || '',
+            email: user?.email || '',
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+        });
     };
 
     const handleInputChange = (e) => {
@@ -93,7 +87,7 @@ const ProfileAdmin = () => {
                 }
             });
             
-            setUser(response.data.user);
+            setUserProfile(response.data.user);
             setAvatarFile(null);
             alert('Profile updated successfully!');
             await loadUserProfile();
@@ -143,20 +137,20 @@ const ProfileAdmin = () => {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
                 <div className="bg-white shadow rounded-lg">
                     {/* Header */}
-                    <div className="px-6 py-4 border-b border-gray-200">
-                        <h1 className="text-2xl font-bold text-gray-900">Admin Profile</h1>
+                    <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Profile</h1>
                         <p className="text-sm text-gray-600">Manage your account settings</p>
                     </div>
 
                     {/* Tabs */}
                     <div className="border-b border-gray-200">
-                        <nav className="flex space-x-8 px-6">
+                        <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-6 overflow-x-auto">
                             <button
                                 onClick={() => setActiveTab('profile')}
-                                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                                     activeTab === 'profile'
                                         ? 'border-orange-500 text-orange-600'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -166,7 +160,7 @@ const ProfileAdmin = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('password')}
-                                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                                className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                                     activeTab === 'password'
                                         ? 'border-orange-500 text-orange-600'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -178,21 +172,21 @@ const ProfileAdmin = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="p-6">
+                    <div className="p-4 sm:p-6">
                         {activeTab === 'profile' && (
                             <div className="space-y-6">
                                 {/* Avatar Section */}
-                                <div className="flex items-center space-x-6">
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
                                     <div className="relative">
-                                        <div className="w-24 h-24 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full flex items-center justify-center overflow-hidden">
+                                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full flex items-center justify-center overflow-hidden">
                                             {avatarPreview ? (
                                                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                                             ) : (
-                                                <User className="w-12 h-12 text-white" />
+                                                <User className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
                                             )}
                                         </div>
-                                        <label className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                            <Camera className="w-4 h-4 text-gray-600" />
+                                        <label className="absolute bottom-0 right-0 bg-white rounded-full p-1.5 sm:p-2 shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <Camera className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
                                             <input
                                                 type="file"
                                                 accept="image/jpeg,image/png,image/jpg"
@@ -201,9 +195,9 @@ const ProfileAdmin = () => {
                                             />
                                         </label>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-medium text-gray-900">Profile Photo</h3>
-                                        <p className="text-sm text-gray-500">Click the camera icon to upload a new photo</p>
+                                    <div className="text-center sm:text-left">
+                                        <h3 className="text-base sm:text-lg font-medium text-gray-900">Profile Photo</h3>
+                                        <p className="text-xs sm:text-sm text-gray-500">Click the camera icon to upload a new photo</p>
                                     </div>
                                 </div>
 

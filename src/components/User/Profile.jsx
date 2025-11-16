@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Edit, Camera, Save, Lock } from 'lucide-react';
+import { User, Mail, Edit, Camera, Save, Lock, Phone } from 'lucide-react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Navbar from "../ui/MainNavbar";
@@ -9,13 +9,15 @@ export default function Profile() {
   const [user, setUser] = useState({
     name: '',
     email: '',
+    phone: '',
     avatar: null,
     created_at: ''
   });
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    email: ''
+    email: '',
+    phone: ''
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
@@ -31,14 +33,28 @@ export default function Profile() {
     loadUserProfile();
   }, []);
 
+  // Clear errors when form data changes
+  useEffect(() => {
+    if (formData.name.trim()) {
+      setErrors(prev => ({ ...prev, name: null }));
+    }
+    if (formData.email.trim()) {
+      setErrors(prev => ({ ...prev, email: null }));
+    }
+    if (formData.phone.trim()) {
+      setErrors(prev => ({ ...prev, phone: null }));
+    }
+  }, [formData]);
+
   const loadUserProfile = async () => {
     try {
-      const response = await api.get('/api/profile');
+      const response = await api.get('/api/user');
       const userData = response.data;
       setUser(userData);
       setFormData({
         name: userData.name || '',
-        email: userData.email || ''
+        email: userData.email || '',
+        phone: userData.phone || ''
       });
       if (userData.avatar) {
         setAvatarPreview(`http://localhost:8000/storage/${userData.avatar}`);
@@ -80,31 +96,74 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     setLoading(true);
     setErrors({});
+    
+    console.log('🔍 DEBUG - Form data before validation:', formData);
+    
+    // Validasi frontend yang lebih robust
+    const nameValue = String(formData.name || '').trim();
+    const emailValue = String(formData.email || '').trim();
+    const phoneValue = String(formData.phone || '').trim();
+    
+    if (!nameValue || !emailValue || !phoneValue) {
+      console.log('❌ Validation failed');
+      setErrors({ 
+        name: !nameValue ? ['Name is required'] : null,
+        email: !emailValue ? ['Email is required'] : null,
+        phone: !phoneValue ? ['Phone is required'] : null
+      });
+      setLoading(false);
+      return;
+    }
+    
+    console.log('✅ All validations passed');
+    
     try {
-      const submitData = new FormData();
-      submitData.append('name', formData.name);
-      submitData.append('email', formData.email);
+      // Get CSRF token first
+      await api.get('/sanctum/csrf-cookie');
       
-      if (avatarFile) {
-        submitData.append('avatar', avatarFile);
-      }
-      
-      const response = await api.post('/api/profile/update', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
+      // Update profile data first
+      console.log('🚀 Updating profile data (JSON)');
+      await api.put('/api/user/profile', {
+        name: nameValue,
+        email: emailValue,
+        phone: phoneValue
       });
       
-      setUser(response.data.user);
+      let response;
+      
+      // Upload avatar separately if provided
+      if (avatarFile) {
+        console.log('📷 Uploading avatar separately');
+        const avatarData = new FormData();
+        avatarData.append('avatar', avatarFile);
+        
+        response = await api.post('/api/user/avatar', avatarData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      } else {
+        // Get updated user data
+        response = await api.get('/api/user');
+      }
+      
+      setUser(response.data.user || response.data);
       setAvatarFile(null);
       setIsEditing(false);
       alert('Profile updated successfully!');
       await loadUserProfile();
     } catch (error) {
+      console.error('❌ Profile update error:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      console.error('❌ Full error object:', error);
+      
       if (error.response?.data?.errors) {
+        console.error('❌ Validation errors:', error.response.data.errors);
         setErrors(error.response.data.errors);
       } else {
-        alert('Failed to update profile');
+        const errorMsg = error.response?.data?.message || error.message || 'Failed to update profile';
+        alert(`Update failed: ${errorMsg}`);
       }
     } finally {
       setLoading(false);
@@ -215,12 +274,33 @@ export default function Profile() {
                     )}
                   </div>
 
+                  {/* Phone Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="Enter your phone number"
+                      />
+                    </div>
+                    {errors.phone && (
+                      <p className="text-red-500 text-sm mt-1">{errors.phone[0]}</p>
+                    )}
+                  </div>
+
                   {/* Action Buttons */}
                   <div className="flex justify-center space-x-4">
                     <button
                       onClick={() => {
                         setIsEditing(false);
-                        setFormData({ name: user.name, email: user.email });
+                        setFormData({ name: user.name || '', email: user.email || '', phone: user.phone || '' });
                         setAvatarFile(null);
                         setAvatarPreview(user.avatar ? `http://localhost:8000/storage/${user.avatar}` : '');
                       }}
@@ -247,6 +327,13 @@ export default function Profile() {
                         <div>
                           <p className="text-sm text-gray-500">Email</p>
                           <p className="font-semibold">{user.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+                        <Phone className="w-5 h-5 text-[#FFA500]" />
+                        <div>
+                          <p className="text-sm text-gray-500">Phone</p>
+                          <p className="font-semibold">{user.phone || 'Not set'}</p>
                         </div>
                       </div>
                     </div>

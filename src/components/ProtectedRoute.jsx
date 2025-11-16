@@ -5,6 +5,7 @@ import { useAuthContext } from '../contexts/AuthContext';
 const ProtectedRoute = ({ children, roles = [] }) => {
     const { user, loading } = useAuthContext();
 
+    // CRITICAL: Wait for auth check to complete
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -13,11 +14,13 @@ const ProtectedRoute = ({ children, roles = [] }) => {
         );
     }
 
-    if (!user) {
+    // CRITICAL: Only redirect if auth check is complete AND user is null
+    if (!loading && !user) {
         return <Navigate to="/login" replace />;
     }
 
-    if (roles.length > 0 && !roles.includes(user.role)) {
+    // CRITICAL: Role check only if user exists
+    if (user && roles.length > 0 && !roles.includes(user.role)) {
         return <Navigate to="/unauthorized" replace />;
     }
 

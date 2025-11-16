@@ -5,7 +5,6 @@ import api from '../../utils/api';
 const MovieForm = ({ movie, onClose, onSave, showToast }) => {
     const [formData, setFormData] = useState({
         name: '',
-        genre: '',
         duration: '',
         status: 'coming_soon',
         description: '',
@@ -13,8 +12,12 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
         director: '',
         production_team: '',
         trailer_url: '',
-        trailer_type: 'url'
+        trailer_type: 'url',
+        price: ''
     });
+    const [studios, setStudios] = useState([]);
+    const [genres, setGenres] = useState([]);
+    const [selectedGenres, setSelectedGenres] = useState([]);
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
     const [trailerFile, setTrailerFile] = useState(null);
@@ -22,10 +25,11 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
+        fetchStudios();
+        fetchGenres();
         if (movie) {
             setFormData({
                 name: movie.name || '',
-                genre: movie.genre || '',
                 duration: movie.duration || '',
                 status: movie.status || 'coming_soon',
                 description: movie.description || '',
@@ -33,13 +37,35 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                 director: movie.director || '',
                 production_team: movie.production_team || '',
                 trailer_url: movie.trailer_url || '',
-                trailer_type: movie.trailer_type || 'url'
+                trailer_type: movie.trailer_type || 'url',
+                price: movie.price || ''
             });
+            if (movie.genres && Array.isArray(movie.genres)) {
+                setSelectedGenres(movie.genres.map(genre => genre.id));
+            }
             if (movie.image) {
                 setImagePreview(`http://localhost:8000/storage/${movie.image}`);
             }
         }
     }, [movie]);
+
+    const fetchStudios = async () => {
+        try {
+            const response = await api.get('/api/studios');
+            setStudios(response.data.data || response.data);
+        } catch (error) {
+            console.error('Failed to fetch studios:', error);
+        }
+    };
+
+    const fetchGenres = async () => {
+        try {
+            const response = await api.get('/api/genres');
+            setGenres(response.data.data || response.data);
+        } catch (error) {
+            console.error('Failed to fetch genres:', error);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -103,8 +129,12 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
             newErrors.name = 'Movie name is required';
         }
         
-        if (!formData.genre.trim()) {
-            newErrors.genre = 'Genre is required';
+        if (selectedGenres.length === 0) {
+            newErrors.genres = 'At least one genre is required';
+        }
+        
+        if (!formData.studio_id) {
+            newErrors.studio_id = 'Studio is required';
         }
         
         if (!formData.duration || formData.duration < 1) {
@@ -143,16 +173,20 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
         try {
             const submitData = new FormData();
             submitData.append('name', formData.name);
-            submitData.append('genre', formData.genre);
             submitData.append('duration', formData.duration);
             submitData.append('status', formData.status);
             submitData.append('description', formData.description);
             submitData.append('rating', formData.rating);
             submitData.append('director', formData.director);
-            submitData.append('production_team', formData.production_team);
+            submitData.append('production_team', formData.production_team || '');
             submitData.append('trailer_type', formData.trailer_type);
+            submitData.append('price', formData.price || '0');
             
-            if (formData.trailer_type === 'url') {
+            selectedGenres.forEach(genreId => {
+                submitData.append('genres[]', genreId);
+            });
+            
+            if (formData.trailer_type === 'url' && formData.trailer_url) {
                 submitData.append('trailer_url', formData.trailer_url);
             }
             
@@ -252,25 +286,65 @@ const MovieForm = ({ movie, onClose, onSave, showToast }) => {
                         )}
                     </div>
 
-                    {/* Genre */}
+                    {/* Studio */}
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Genre *
+                            Studio *
                         </label>
-                        <input
-                            type="text"
-                            name="genre"
-                            value={formData.genre}
+                        <select
+                            name="studio_id"
+                            value={formData.studio_id}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-                            placeholder="e.g. Action, Adventure, Drama"
-                        />
-                        {errors.genre && (
+                        >
+                            <option value="">Select Studio</option>
+                            {studios.map(studio => (
+                                <option key={studio.id} value={studio.id}>
+                                    {studio.name}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.studio_id && (
                             <p className="text-red-500 text-sm mt-2 flex items-center">
                                 <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
                                     <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                                 </span>
-                                {errors.genre}
+                                {errors.studio_id}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Genres */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Genres *
+                        </label>
+                        <div className="grid grid-cols-2 gap-2 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                            {genres.map(genre => (
+                                <label key={genre.id} className="flex items-center space-x-2 cursor-pointer hover:bg-white p-2 rounded">
+                                    <input
+                                        type="checkbox"
+                                        value={genre.id}
+                                        checked={selectedGenres.includes(genre.id)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedGenres([...selectedGenres, genre.id]);
+                                            } else {
+                                                setSelectedGenres(selectedGenres.filter(id => id !== genre.id));
+                                            }
+                                        }}
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-gray-700">{genre.name}</span>
+                                </label>
+                            ))}
+                        </div>
+                        {errors.genres && (
+                            <p className="text-red-500 text-sm mt-2 flex items-center">
+                                <span className="w-4 h-4 bg-red-100 rounded-full flex items-center justify-center mr-2">
+                                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                                {errors.genres}
                             </p>
                         )}
                     </div>

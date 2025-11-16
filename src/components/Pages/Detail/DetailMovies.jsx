@@ -1,12 +1,16 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Clock, Calendar, MapPin, ArrowLeft, Play, X } from 'lucide-react';
+import { useAuthContext } from '../../../contexts/AuthContext';
 import Navbar from '../../ui/MainNavbar';
 import api from '../../../utils/api';
+
 
 export default function DetailMovies() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuthContext();
   const [movie, setMovie] = useState(null);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,10 +23,16 @@ export default function DetailMovies() {
 
   const fetchMovieDetails = async () => {
     try {
-      const response = await api.get(`/api/movies/${id}`);
-      const movieData = response.data.data || response.data;
+      const [movieResponse, schedulesResponse] = await Promise.all([
+        api.get(`/api/movies/${id}`),
+        api.get(`/api/schedules/movie/${id}`)
+      ]);
+      
+      const movieData = movieResponse.data.data || movieResponse.data;
+      const schedulesData = schedulesResponse.data.data || [];
+      
       setMovie(movieData);
-      setSchedules(movieData.schedules || []);
+      setSchedules(schedulesData);
     } catch (error) {
       console.error('Failed to fetch movie details:', error);
       setError('Failed to load movie details');
@@ -125,9 +135,12 @@ export default function DetailMovies() {
               {/* Movie Poster */}
               <div className="md:w-1/3">
                 <img
-                  src={movie.image ? `http://localhost:8000/storage/${movie.image}` : '/placeholder-movie.jpg'}
+                  src={movie.image_url || '/placeholder-movie.jpg'}
                   alt={movie.name}
                   className="w-full h-96 md:h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = '/placeholder-movie.jpg';
+                  }}
                 />
               </div>
 
@@ -153,8 +166,22 @@ export default function DetailMovies() {
                     <Clock className="w-5 h-5 mr-2" />
                     <span>{formatDuration(movie.duration)}</span>
                   </div>
-                  <div className="bg-gray-200 px-3 py-1 rounded-full text-sm">
-                    {movie.genre}
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-900 mb-2">Genres</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {movie.genres && movie.genres.length > 0 ? (
+                      movie.genres.map(genre => (
+                        <span key={genre.id} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                          {genre.name}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">
+                        {movie.genre || 'No genre'}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -187,15 +214,13 @@ export default function DetailMovies() {
                   </div>
                 </div>
 
-                {(movie.trailer_url || movie.trailer_file) && (
-                  <button 
-                    onClick={handleWatchTrailer}
-                    className="flex items-center bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    Watch Trailer
-                  </button>
-                )}
+                <button 
+                  onClick={handleWatchTrailer}
+                  className="flex items-center bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Watch Trailer
+                </button>
               </div>
             </div>
           </div>
@@ -235,7 +260,18 @@ export default function DetailMovies() {
                           Rp {parseInt(schedule.price || 0).toLocaleString('id-ID')}
                         </div>
                         <button 
-                          onClick={() => navigate(`/booking/${schedule.id}`)}
+                          onClick={() => {
+                            console.log('🔍 Book Now clicked - Auth check:', { user, isAuthenticated });
+                            
+                            if (!isAuthenticated || !user) {
+                              alert('Please login first to book tickets');
+                              navigate('/login');
+                              return;
+                            }
+                            
+                            console.log('✅ User authenticated, navigating to booking');
+                            navigate(`/booking/${schedule.id}`);
+                          }}
                           className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
                         >
                           Book Now

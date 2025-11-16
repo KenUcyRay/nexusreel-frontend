@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, User, UserPlus, Home } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, UserPlus, Home, Phone } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import registerImage from '../../assets/register.png';
 
@@ -9,11 +9,12 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuthContext();
+  const { register, login } = useAuthContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -31,13 +32,18 @@ export default function Register() {
       const userData = {
         name,
         email,
+        phone,
         password,
         password_confirmation: confirmPassword
       };
       
       const result = await register(userData);
-      if (result.user) {
+      if (result && result.success && result.user) {
+        console.log('✅ Registration successful:', result.user.email);
+        // Registration successful and user is already logged in
         navigate('/home');
+      } else {
+        setError(result?.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
       setError(error.response?.data?.message || 'Registration failed');
@@ -101,6 +107,21 @@ export default function Register() {
                     className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-300 outline-none text-xs sm:text-sm"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-1 text-xs sm:text-sm">Phone Number</label>
+                <div className="relative">
+                  <Phone className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-300 outline-none text-xs sm:text-sm"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     required
                   />
                 </div>

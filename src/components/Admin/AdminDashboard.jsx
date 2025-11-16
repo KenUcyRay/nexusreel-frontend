@@ -1,285 +1,211 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { DollarSign, Calendar, TrendingUp, Film, MapPin, Clock } from 'lucide-react';
 import api from '../../utils/api';
-import { Film, Users, DoorOpen, DollarSign, Coffee } from 'lucide-react';
-import RevenueChart from './RevenueChart';
-import SimpleLogout from '../SimpleLogout';
-import studioService from '../../services/studioService';
 
-const AdminDashboard = () => {
-    const [stats, setStats] = useState({
-        totalMovies: 0,
-        totalUsers: 0,
-        totalStudios: 0,
-        totalFoodItems: 0,
-        totalRevenue: 0,
-    });
-    
-    const [user, setUser] = useState(null);
-    const [currentView, setCurrentView] = useState('dashboard');
-    const [recentActivities, setRecentActivities] = useState([]);
-    
-    useEffect(() => {
-        // Get user from localStorage
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            setUser(JSON.parse(userData));
-        }
-    }, []);
+export default function AdminDashboard() {
+  const [data, setData] = useState({
+    today: 0,
+    thisMonth: 0,
+    total: 0,
+    totalPurchases: 0,
+    todayPurchases: 0,
+    monthlyPurchases: 0,
+    totalStudios: 0,
+    totalMovies: 0,
+    totalSchedules: 0,
+    recentTransactions: []
+  });
+  const [loading, setLoading] = useState(true);
 
-    const fetchDashboardData = useCallback(async () => {
-        try {
-            // Fetch movies count
-            const moviesResponse = await api.get('/api/admin/movies');
-            let movies = [];
-            if (Array.isArray(moviesResponse.data)) {
-                movies = moviesResponse.data;
-            } else if (moviesResponse.data && Array.isArray(moviesResponse.data.data)) {
-                movies = moviesResponse.data.data;
-            }
-            const totalMovies = movies.length;
-            
-            // Fetch users count
-            let totalUsers = 0;
-            try {
-                const usersResponse = await api.get('/api/admin/users');
-                totalUsers = usersResponse.data.length;
-            } catch (usersError) {
-                // Users endpoint not available
-                totalUsers = 0;
-            }
-            
-            // Fetch food count
-            let totalFoodItems = 0;
-            try {
-                const foodResponse = await api.get('/api/admin/foods');
-                totalFoodItems = foodResponse.data.length;
-            } catch (foodError) {
-                // Food endpoint not available
-                totalFoodItems = 0;
-            }
-            
-            // Fetch studios count
-            let totalStudios = 0;
-            try {
-                const studiosResponse = await studioService.getStudios();
-                totalStudios = studiosResponse.data.data?.length || 0;
-            } catch (studiosError) {
-                // Studios endpoint not available - set default value
-                totalStudios = 0;
-            }
-            
-            // Generate recent activities based on data
-            const activities = [];
-            if (movies.length > 0) {
-                const latestMovies = movies.slice(-3);
-                latestMovies.forEach(movie => {
-                    activities.push({
-                        id: `movie-${movie.id}`,
-                        type: 'movie',
-                        action: 'created',
-                        item: movie.name,
-                        time: 'Recently'
-                    });
-                });
-            }
-            
-            try {
-                const foodResponse = await api.get('/api/admin/foods');
-                if (foodResponse.data.length > 0) {
-                    const latestFood = foodResponse.data.slice(-2);
-                    latestFood.forEach(food => {
-                        activities.push({
-                            id: `food-${food.id}`,
-                            type: 'food',
-                            action: 'created',
-                            item: food.name,
-                            time: 'Recently'
-                        });
-                    });
-                }
-            } catch (foodError) {
-                // Food endpoint not available
-            }
-            
-            setRecentActivities(activities.slice(-5)); // Show last 5 activities
-            
-            // Calculate revenue from localStorage
-            const transactions = JSON.parse(localStorage.getItem('userTransactions') || '[]');
-            const totalRevenue = transactions
-                .filter(t => t.payment_status === 'success')
-                .reduce((sum, t) => sum + parseInt(t.totalPrice || 0), 0);
-            
-            // Try to fetch other dashboard data, fallback to counts only
-            try {
-                const dashboardResponse = await api.get('/api/admin/dashboard');
-                setStats({
-                    ...dashboardResponse.data.data,
-                    totalMovies,
-                    totalUsers,
-                    totalFoodItems,
-                    totalStudios,
-                    totalRevenue
-                });
-            } catch (dashboardError) {
-                // If dashboard endpoint doesn't exist, just set counts
-                setStats(prevStats => ({
-                    ...prevStats,
-                    totalMovies,
-                    totalUsers,
-                    totalFoodItems,
-                    totalStudios,
-                    totalRevenue
-                }));
-            }
-        } catch (error) {
-            console.error('Failed to fetch dashboard data:', error);
-        }
-    }, []);
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, [fetchDashboardData]);
+  const fetchDashboardData = async () => {
+    try {
+      const response = await api.get('/api/dashboard/admin');
+      setData(response.data);
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center">
-                            <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <span className="text-sm text-gray-700">Welcome, {user?.name || 'Admin'}</span>
-                            <SimpleLogout />
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            
-            <div className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <Film className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Movies</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.totalMovies}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <Users className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Users</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.totalUsers}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <Coffee className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Food</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.totalFoodItems}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <DoorOpen className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Studios</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.totalStudios}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Revenue Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <DollarSign className="h-6 w-6 text-green-400" />
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
-                                    <dd className="text-lg font-medium text-gray-900">Rp {stats.totalRevenue.toLocaleString('id-ID')}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Revenue Chart */}
-            <div className="mb-8">
-                <RevenueChart />
-            </div>
-
-            <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
-                <div className="space-y-3">
-                    {recentActivities.length > 0 ? (
-                        recentActivities.map((activity) => (
-                            <div key={activity.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                    activity.type === 'movie' 
-                                        ? 'bg-blue-100 text-blue-600' 
-                                        : 'bg-orange-100 text-orange-600'
-                                }`}>
-                                    {activity.type === 'movie' ? (
-                                        <Film className="w-4 h-4" />
-                                    ) : (
-                                        <Coffee className="w-4 h-4" />
-                                    )}
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-medium text-gray-900">
-                                        {activity.type === 'movie' ? 'Movie' : 'Food'} {activity.action}: {activity.item}
-                                    </p>
-                                    <p className="text-xs text-gray-500">{activity.time}</p>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="text-sm text-gray-600">No recent activity</div>
-                    )}
-                </div>
-            </div>
-        </div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500">Loading dashboard...</div>
+      </div>
     );
-};
+  }
 
-export default AdminDashboard;
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Admin Dashboard</h1>
+        
+        {/* Revenue Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <DollarSign className="w-8 h-8 sm:w-10 sm:h-10 text-green-500 mr-3 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Today</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">Rp {data.today.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 mr-3 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">This Month</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">Rp {data.thisMonth.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 mr-3 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Overall</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">Rp {data.total.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Purchase Statistics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500 mr-3 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Purchases</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.totalPurchases}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-indigo-500 mr-3 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Today's Purchases</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.todayPurchases}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <DollarSign className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500 mr-3 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Monthly Purchases</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.monthlyPurchases}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Studios</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.totalStudios}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <Film className="w-8 h-8 sm:w-10 sm:h-10 text-red-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Movies</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.totalMovies}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Schedules</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.totalSchedules}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Transactions Table */}
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Transactions</h3>
+          
+          {data.recentTransactions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Transaction No.
+                    </th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Customer
+                    </th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Total
+                    </th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {data.recentTransactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                        {new Date(transaction.created_at).toLocaleDateString('id-ID')}
+                      </td>
+                      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                        {transaction.order_id}
+                      </td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                        {transaction.customer_name}
+                      </td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-semibold text-gray-900">
+                        Rp {transaction.amount.toLocaleString('id-ID')}
+                      </td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          transaction.status === 'success' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {transaction.status === 'success' ? 'Completed' : 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No recent transactions</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

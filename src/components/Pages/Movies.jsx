@@ -15,21 +15,13 @@ export default function Movies() {
 
   const fetchMovies = async () => {
     try {
-      const response = await api.get('/api/movies');
-      let movies = [];
+      const [liveResponse, comingResponse] = await Promise.all([
+        api.get('/api/movies'),
+        api.get('/api/movies/coming-soon')
+      ]);
       
-      // Handle different response structures
-      if (Array.isArray(response.data)) {
-        movies = response.data;
-      } else if (response.data && Array.isArray(response.data.data)) {
-        movies = response.data.data;
-      } else {
-        console.warn('Unexpected API response structure:', response.data);
-        movies = [];
-      }
-      
-      setNowPlayingMovies(movies.filter(movie => movie && movie.status === 'live_now'));
-      setComingSoonMovies(movies.filter(movie => movie && movie.status === 'coming_soon'));
+      setNowPlayingMovies(liveResponse.data?.data || []);
+      setComingSoonMovies(comingResponse.data?.data || []);
     } catch (error) {
       console.error('Failed to fetch movies:', error);
       setNowPlayingMovies([]);
@@ -98,9 +90,12 @@ export default function Movies() {
                 >
                   <div className="relative">
                     <img
-                      src={movie.image ? `http://localhost:8000/storage/${movie.image}` : '/placeholder-movie.jpg'}
+                      src={movie.image_url || '/placeholder-movie.jpg'}
                       alt={movie.name}
                       className="w-full h-64 sm:h-72 lg:h-80 object-cover"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-movie.jpg';
+                      }}
                     />
                     {activeTab === 'nowPlaying' ? (
                       <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-black/70 text-white px-2 py-1 rounded-lg flex items-center">
@@ -115,7 +110,17 @@ export default function Movies() {
                   </div>
                   <div className="p-4 sm:p-6">
                     <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 line-clamp-2">{movie.name}</h3>
-                    <p className="text-gray-600 mb-2 text-sm sm:text-base">{movie.genre}</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {movie.genres && movie.genres.length > 0 ? (
+                        movie.genres.map(genre => (
+                          <span key={genre.id} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                            {genre.name}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-600 text-sm sm:text-base">{movie.genre || 'No genre'}</span>
+                      )}
+                    </div>
                     <p className="text-gray-500 text-xs sm:text-sm mb-2">{formatDuration(movie.duration)}</p>
                     {movie.release_date && (
                       <p className="text-[#FFA500] font-semibold mb-4 text-sm sm:text-base">Release: {movie.release_date}</p>

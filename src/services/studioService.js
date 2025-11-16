@@ -5,16 +5,16 @@ export const studioService = {
   getStudios: () => api.get('/api/studios'),
   
   // Create new studio
-  createStudio: (data) => api.post('/api/studios', data),
+  createStudio: (data) => api.post('/api/admin/studios', data),
   
   // Get studio by ID
   getStudio: (id) => api.get(`/api/studios/${id}`),
   
   // Update studio
-  updateStudio: (id, data) => api.put(`/api/studios/${id}`, data),
+  updateStudio: (id, data) => api.put(`/api/admin/studios/${id}`, data),
   
   // Delete studio
-  deleteStudio: (id) => api.delete(`/api/studios/${id}`)
+  deleteStudio: (id) => api.delete(`/api/admin/studios/${id}`)
 };
 
 export default studioService;

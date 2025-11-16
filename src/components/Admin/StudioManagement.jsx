@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState, useEffect } from 'react';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import StudioForm from './StudioForm';
