@@ -74,8 +74,8 @@ export default function MainNavbar() {
   return (
     <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${
       isScrolled 
-        ? 'bg-white/80 backdrop-blur-md' 
-        : 'bg-white'
+        ? 'bg-transparent backdrop-blur-md' 
+        : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top row - hidden when scrolled */}
@@ -119,7 +119,7 @@ export default function MainNavbar() {
                 <User className={`w-6 h-6 text-gray-700 bg-gray-500 rounded-full p-1 ${userProfile?.avatar ? 'hidden' : 'block'}`} />
               </button>
               {isMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                   {user ? (
                     <>
                       <div className="px-4 py-2 border-b border-gray-200">
@@ -201,7 +201,7 @@ export default function MainNavbar() {
           <div className={`flex items-center transition-all duration-300 overflow-x-auto ${
             isScrolled 
               ? 'space-x-4 sm:space-x-8' 
-              : 'bg-white border border-gray-300 rounded-full shadow-md hover:shadow-lg'
+              : 'bg-white/80 backdrop-blur-md border border-gray-300 rounded-full shadow-md hover:shadow-lg'
           }`}>
             <a 
               href="/movies" 

@@ -182,27 +182,26 @@ export default function Profile() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative h-80 sm:h-96 bg-gradient-to-r from-gray-900 to-gray-700 pt-28 sm:pt-40">
-        <div className="absolute inset-0 bg-black/30" />
+      <section className="relative h-80 sm:h-96 bg-gradient-to-r from-white to-[#C6E7FF] pt-28 sm:pt-40">
         <div className="relative h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-white text-center" data-aos="fade-up">
+            <div className="text-gray-800 text-center" data-aos="fade-up">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">My Profile</h1>
-              <p className="text-lg sm:text-xl text-gray-300">Manage Your Account Information</p>
+              <p className="text-lg sm:text-xl text-gray-600">Manage Your Account Information</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Profile Content */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-gradient-to-br from-white to-[#C6E7FF]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden" data-aos="fade-up">
+          <div className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-lg overflow-hidden" data-aos="fade-up">
             {/* Profile Header */}
             <div className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <div className="relative">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-white to-[#C6E7FF] rounded-full flex items-center justify-center overflow-hidden">
                     {avatarPreview ? (
                       <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
@@ -210,7 +209,7 @@ export default function Profile() {
                     )}
                   </div>
                   {isEditing && (
-                    <label className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                    <label className="absolute bottom-0 right-0 bg-gradient-to-br from-white to-[#C6E7FF] rounded-full p-1 shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
                       <Camera className="w-3 h-3 text-gray-600" />
                       <input
                         type="file"

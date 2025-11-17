@@ -90,7 +90,7 @@ const UserManagement = () => {
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-xl border border-white/20 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">

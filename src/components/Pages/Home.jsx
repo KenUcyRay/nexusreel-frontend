@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus, Hamburger, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Film, Star, Play, Facebook, Instagram, Twitter, Youtube, BookPlus, Hamburger, X, Percent, Gift, Clock, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -44,28 +44,92 @@ const carouselMovies = [
   }
 ];
 
+// Discount Banner Component
+const DiscountBanner = ({ discounts }) => {
+  if (!discounts || discounts.length === 0) return null;
+
+  const formatDiscountText = (discount) => {
+    if (discount.type === 'percentage') {
+      return `${discount.amount}% OFF`;
+    }
+    return `Rp ${parseInt(discount.amount).toLocaleString('id-ID')} OFF`;
+  };
+
+  const formatMinPurchase = (minPurchase) => {
+    if (!minPurchase || minPurchase === 0) return 'No minimum purchase';
+    return `Min. purchase Rp ${parseInt(minPurchase).toLocaleString('id-ID')}`;
+  };
+
+  const formatValidPeriod = (startDate, endDate) => {
+    const start = new Date(startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    const end = new Date(endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    return `${start} - ${end}`;
+  };
+
+  return (
+    <section className="py-4 sm:py-6 bg-gradient-to-r from-orange-50 to-yellow-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-4" data-aos="fade-up">
+          <div className="flex items-center justify-center mb-2">
+            <Gift className="w-5 h-5 text-orange-500 mr-2" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800">Special Offers</h2>
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+          {discounts.map((discount, index) => (
+            <div 
+              key={discount.id}
+              className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+              data-aos="fade-up"
+              data-aos-delay={index * 100}
+            >
+              <div className="flex items-center space-x-2 text-sm font-medium">
+                <Percent className="w-4 h-4" />
+                <span>{formatDiscountText(discount)}</span>
+                <span className="text-orange-100">•</span>
+                <span className="text-xs">{formatMinPurchase(discount.min_purchase)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="text-center mt-3">
+          <p className="text-xs text-gray-500">
+            🎬 Discounts automatically applied at checkout
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [comingSoonMovies, setComingSoonMovies] = useState([]);
   const [carouselMovies, setCarouselMovies] = useState([]);
+  const [activeDiscounts, setActiveDiscounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedTrailer, setSelectedTrailer] = useState(null);
 
   const fetchMovies = async () => {
     try {
-      const [liveResponse, comingResponse] = await Promise.all([
+      const [liveResponse, comingResponse, discountResponse] = await Promise.all([
         api.get('/api/movies'),
-        api.get('/api/movies/coming-soon')
+        api.get('/api/movies/coming-soon'),
+        api.get('/api/debug-discounts').catch(() => ({ data: { discounts: [] } }))
       ]);
       
       const liveMovies = liveResponse.data?.data || [];
       const comingSoonMovies = comingResponse.data?.data || [];
+      const discounts = discountResponse.data?.discounts || [];
       
       setNowPlayingMovies(liveMovies);
       setComingSoonMovies(comingSoonMovies);
+      setActiveDiscounts(discounts.slice(0, 3)); // Show max 3 discounts
       
       // Set carousel movies from live movies
       const latestMovies = liveMovies.slice(0, 4).map(movie => ({
@@ -92,6 +156,7 @@ export default function Home() {
       console.error('Failed to fetch movies:', error);
       setNowPlayingMovies([]);
       setComingSoonMovies([]);
+      setActiveDiscounts([]);
       setCarouselMovies([{
         id: 1,
         title: "Welcome to NexusVerse",
@@ -120,16 +185,30 @@ export default function Home() {
 
     fetchMovies();
 
-    // Auto carousel
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % (carouselMovies.length || 1));
-    }, 4000);
+    // Auto carousel only if more than 1 movie
+    let timer;
+    if (carouselMovies.length > 1) {
+      timer = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % carouselMovies.length);
+      }, 4000);
+    }
     
-    return () => clearInterval(timer);
-  }, []);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [carouselMovies.length]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (carouselMovies.length || 1));
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + (carouselMovies.length || 1)) % (carouselMovies.length || 1));
+  const nextSlide = () => {
+    if (carouselMovies.length > 1) {
+      setCurrentSlide((prev) => (prev + 1) % carouselMovies.length);
+    }
+  };
+  
+  const prevSlide = () => {
+    if (carouselMovies.length > 1) {
+      setCurrentSlide((prev) => (prev - 1 + carouselMovies.length) % carouselMovies.length);
+    }
+  };
 
   const handleWatchTrailer = (movie) => {
     if (movie.trailer_type === 'url' && movie.trailer_url) {
@@ -141,68 +220,116 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
       <Navbar />
       
-      {/* Hero Carousel Section */}
+      {/* Hero Banner/Carousel Section */}
       {(nowPlayingMovies.length > 0 || comingSoonMovies.length > 0) ? (
-        <section className="relative h-screen overflow-hidden pt-28 sm:pt-40">
+        <section className="relative h-screen overflow-hidden pt-48 sm:pt-56">
           <div className="relative h-full">
-            {carouselMovies.map((movie, index) => (
-            <div
-              key={movie.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div
-                className="h-full bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url(${movie.backdrop})` }}
-              >
-                <div className="absolute inset-0 bg-black/50" />
-                <div className="relative h-full flex items-center">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-2xl text-white" data-aos="fade-up">
-                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-tight">{movie.title}</h1>
-                      <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-300">{movie.genre}</p>
-                      <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">{movie.description}</p>
-                      {(movie.trailer_url || movie.trailer_file) && (
-                        <button 
-                          onClick={() => handleWatchTrailer(movie)}
-                          className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base cursor-pointer"
-                        >
-                          <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                          Watch Trailer
-                        </button>
-                      )}
+            {carouselMovies.length > 1 ? (
+              // Carousel for multiple movies
+              <>
+                {carouselMovies.map((movie, index) => (
+                  <div
+                    key={movie.id}
+                    className={`absolute inset-0 transition-opacity duration-1000 ${
+                      index === currentSlide ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <div
+                      className="h-full bg-cover bg-center bg-no-repeat"
+                      style={{ backgroundImage: `url(${movie.backdrop})` }}
+                    >
+                      <div className="absolute inset-0 bg-black/50" />
+                      <div className="relative h-full flex items-center">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                          <div className="max-w-2xl text-white" data-aos="fade-up">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-tight">{movie.title}</h1>
+                            <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-300">{movie.genre}</p>
+                            <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">{movie.description}</p>
+                            {(movie.trailer_url || movie.trailer_file) && (
+                              <button 
+                                onClick={() => handleWatchTrailer(movie)}
+                                className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base cursor-pointer"
+                              >
+                                <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                                Watch Trailer
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Carousel Navigation Arrows */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors z-10"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors z-10"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                
+                {/* Carousel Indicators */}
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {carouselMovies.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-colors ${
+                        index === currentSlide ? 'bg-white' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              // Single banner for one movie
+              carouselMovies.length === 1 && (
+                <div className="h-full">
+                  <div
+                    className="h-full bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: `url(${carouselMovies[0].backdrop})` }}
+                  >
+                    <div className="absolute inset-0 bg-black/50" />
+                    <div className="relative h-full flex items-center">
+                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="max-w-2xl text-white" data-aos="fade-up">
+                          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-4 leading-tight">{carouselMovies[0].title}</h1>
+                          <p className="text-base sm:text-lg md:text-xl mb-2 text-gray-300">{carouselMovies[0].genre}</p>
+                          <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">{carouselMovies[0].description}</p>
+                          {(carouselMovies[0].trailer_url || carouselMovies[0].trailer_file) && (
+                            <button 
+                              onClick={() => handleWatchTrailer(carouselMovies[0])}
+                              className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm sm:text-base cursor-pointer"
+                            >
+                              <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                              Watch Trailer
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-
-          {/* Carousel Indicators */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            {carouselMovies.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentSlide ? 'bg-white' : 'bg-white/50'
-                }`}
-              />
-            ))}
+              )
+            )}
           </div>
         </section>
       ) : (
-        <section className="relative h-96 overflow-hidden pt-28 sm:pt-40 bg-gradient-to-r from-gray-800 to-gray-900">
+        <section className="relative h-96 overflow-hidden pt-48 sm:pt-56 bg-gradient-to-r from-white to-[#C6E7FF]">
           <div className="relative h-full flex items-center justify-center">
-            <div className="text-center text-white">
+            <div className="text-center text-gray-800">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Welcome to NexusVerse</h1>
-              <p className="text-lg sm:text-xl mb-8">Your premium cinema experience awaits</p>
+              <p className="text-lg sm:text-xl mb-8 text-gray-600">Your premium cinema experience awaits</p>
               <button className="bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity">
                 Explore Movies
               </button>
@@ -210,8 +337,12 @@ export default function Home() {
           </div>
         </section>
       )}
+      
+      {/* Discount Information Section */}
+      <DiscountBanner discounts={activeDiscounts} />
+      
       {/* Now Playing Section */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12" data-aos="fade-up">Now Playing</h2>
           {loading ? (
@@ -223,7 +354,7 @@ export default function Home() {
               {nowPlayingMovies.map((movie, index) => (
                 <div 
                   key={movie.id} 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                   data-aos="fade-up"
                   data-aos-delay={index * 100}
                   onClick={() => navigate(`/movies/${movie.id}`)}
@@ -266,7 +397,7 @@ export default function Home() {
       </section>
 
       {/* Coming Soon Section */}
-      <section className="py-12 sm:py-16 bg-gray-50">
+      <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12" data-aos="fade-up">Coming Soon</h2>
           {loading ? (
@@ -278,7 +409,7 @@ export default function Home() {
               {comingSoonMovies.map((movie, index) => (
                 <div 
                   key={movie.id} 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                   data-aos="fade-up"
                   data-aos-delay={index * 100}
                   onClick={() => navigate(`/movies/${movie.id}`)}
@@ -321,7 +452,7 @@ export default function Home() {
       </section>
 
       {/* Social Media Section */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-6 sm:mb-8" data-aos="fade-up">Follow Us</h2>
           <p className="text-gray-600 mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base" data-aos="fade-up" data-aos-delay="100">
@@ -359,7 +490,7 @@ export default function Home() {
       {/* Video Modal for Carousel Trailers */}
       {showVideoModal && selectedTrailer && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-          <div className="relative bg-white rounded-lg overflow-hidden max-w-4xl w-full max-h-[90vh]">
+          <div className="relative bg-gradient-to-br from-white to-[#C6E7FF] rounded-lg overflow-hidden max-w-4xl w-full max-h-[90vh]">
             <button
               onClick={() => setShowVideoModal(false)}
               className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition-opacity z-10"

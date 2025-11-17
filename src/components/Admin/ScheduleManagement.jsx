@@ -110,10 +110,10 @@ const ScheduleManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF] p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-xl border border-white/20 p-4 sm:p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Schedule Management</h2>
@@ -132,7 +132,7 @@ const ScheduleManagement = () => {
       </div>
 
       {/* Schedules Table */}
-      <div className="bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-gradient-to-br from-white to-[#C6E7FF] shadow-xl rounded-xl border border-white/20 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">

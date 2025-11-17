@@ -57,10 +57,35 @@ export default function DetailMovies() {
   };
 
   const formatTime = (timeString) => {
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('id-ID', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (!timeString) return 'N/A';
+    
+    // Handle different time formats
+    try {
+      // If it's already in HH:MM format
+      if (timeString.match(/^\d{2}:\d{2}$/)) {
+        return timeString;
+      }
+      
+      // If it's a full datetime string, extract time
+      if (timeString.includes('T')) {
+        const time = timeString.split('T')[1].substring(0, 5);
+        return time;
+      }
+      
+      // Try parsing as date and extract time
+      const date = new Date(timeString);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+      
+      return timeString;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeString || 'N/A';
+    }
   };
 
   const getRatingDescription = (rating) => {
@@ -86,7 +111,7 @@ export default function DetailMovies() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
         <Navbar />
         <div className="pt-32 flex justify-center items-center h-64">
           <div className="text-gray-500">Loading movie details...</div>
@@ -97,7 +122,7 @@ export default function DetailMovies() {
 
   if (error || !movie) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
         <Navbar />
         <div className="pt-32 flex justify-center items-center h-64">
           <div className="text-center">
@@ -115,7 +140,7 @@ export default function DetailMovies() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
       <Navbar />
       
       <div className="pt-32 pb-16">

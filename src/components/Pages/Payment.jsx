@@ -9,6 +9,9 @@ export default function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [discount, setDiscount] = useState(null);
+  const [subtotal, setSubtotal] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
   
   // Check if user is cashier
   const { user } = useAuthContext();
@@ -26,8 +29,42 @@ export default function Payment() {
     console.log('Booking data received in Payment:', bookingData);
     if (!bookingData) {
       navigate('/movies');
+    } else {
+      checkDiscount();
     }
   }, [bookingData, navigate]);
+  
+  const checkDiscount = async () => {
+    if (!bookingData?.schedule?.id || !bookingData?.totalPrice) return;
+    
+    const calculatedSubtotal = parseFloat(bookingData.totalPrice);
+    setSubtotal(calculatedSubtotal);
+    setFinalTotal(calculatedSubtotal);
+    
+    try {
+      console.log('🔍 Checking discount with:', {
+        schedule_id: bookingData.schedule.id,
+        subtotal: calculatedSubtotal
+      });
+      
+      const response = await api.post('/api/check-discount', {
+        schedule_id: bookingData.schedule.id,
+        subtotal: calculatedSubtotal
+      });
+      
+      console.log('📋 Discount response:', response.data);
+      
+      if (response.data.success && response.data.discount) {
+        console.log('✅ Discount applied:', response.data.discount);
+        setDiscount(response.data.discount);
+        setFinalTotal(response.data.discount.final_total);
+      } else {
+        console.log('❌ No discount found');
+      }
+    } catch (error) {
+      console.error('Failed to check discount:', error);
+    }
+  };
 
   // Auto-populate user data when user is available
   useEffect(() => {
@@ -67,7 +104,10 @@ export default function Payment() {
     setLoading(true);
     try {
       const paymentData = {
-        amount: bookingData.totalPrice,
+        amount: finalTotal,
+        subtotal: subtotal,
+        discount_id: discount?.id || null,
+        discount_amount: discount?.discount_amount || 0,
         customer_name: customerData.name,
         customer_email: customerData.email || user?.email || 'customer@nexuscinema.com',
         seats: bookingData.selectedSeats,
@@ -106,7 +146,8 @@ export default function Payment() {
               payment_status: 'completed',
               payment_date: new Date().toISOString(),
               type: 'movie',
-              customer_email: customerData.email || user.email || 'customer@nexuscinema.com'
+              customer_email: customerData.email || user.email || 'customer@nexuscinema.com',
+              discount: discount
             };
             console.log('💾 Storing success data to sessionStorage:', successData);
             sessionStorage.setItem('bookingSuccess', JSON.stringify(successData));
@@ -308,11 +349,54 @@ export default function Payment() {
               </div>
               
               <div className="border-t pt-3 sm:pt-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-base sm:text-lg font-semibold">Total Amount</span>
-                  <span className="text-lg sm:text-2xl font-bold text-[#FFA500]">
-                    Rp {parseInt(bookingData.totalPrice).toLocaleString('id-ID')}
-                  </span>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Subtotal</span>
+                    <span className="font-semibold">Rp {parseInt(subtotal).toLocaleString('id-ID')}</span>
+                  </div>
+                  
+                  {discount ? (
+                    <>
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 my-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            <span className="text-sm font-medium text-green-800">Discount Applied</span>
+                          </div>
+                          <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                            {discount.type === 'percentage' ? `${discount.amount}%` : `Rp ${parseInt(discount.amount).toLocaleString('id-ID')}`}
+                          </span>
+                        </div>
+                        <div className="text-xs text-green-700 mb-1">{discount.name}</div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-green-700">Discount Amount</span>
+                          <span className="font-bold text-green-800">-Rp {parseInt(discount.discount_amount).toLocaleString('id-ID')}</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 my-2">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+                        <span className="text-sm text-gray-600">No discount applied</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center border-t pt-2 mt-3">
+                    <span className="text-base sm:text-lg font-semibold">Total Amount</span>
+                    <span className="text-lg sm:text-2xl font-bold text-[#FFA500]">
+                      Rp {parseInt(finalTotal).toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                  
+                  {discount && (
+                    <div className="text-center mt-2">
+                      <span className="text-xs text-green-600 font-medium">
+                        💰 You saved Rp {parseInt(discount.discount_amount).toLocaleString('id-ID')}!
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

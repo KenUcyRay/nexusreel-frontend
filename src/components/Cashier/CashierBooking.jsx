@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, MapPin, Users } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin } from 'lucide-react';
 import api from '../../utils/api';
+import { getImageUrl, getPlaceholderImage } from '../../utils/imageUtils';
 
 export default function CashierBooking() {
   const [schedules, setSchedules] = useState([]);
@@ -59,9 +60,12 @@ export default function CashierBooking() {
               onClick={() => handleScheduleSelect(schedule.id)}
             >
               <img
-                src={schedule.movie?.image ? `http://localhost:8000/storage/${schedule.movie.image}` : '/placeholder-movie.jpg'}
+                src={schedule.movie?.image_url || getImageUrl(schedule.movie?.image) || getPlaceholderImage()}
                 alt={schedule.movie?.name}
                 className="w-full h-64 object-cover"
+                onError={(e) => {
+                  e.target.src = getPlaceholderImage();
+                }}
               />
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{schedule.movie?.name}</h3>
@@ -80,10 +84,7 @@ export default function CashierBooking() {
                     <MapPin className="w-4 h-4 mr-2" />
                     {schedule.studio?.name}
                   </div>
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2" />
-                    Available Seats: {schedule.available_seats || 0}
-                  </div>
+
                 </div>
                 
                 <div className="mt-4 pt-4 border-t">

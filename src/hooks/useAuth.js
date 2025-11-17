@@ -7,7 +7,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Check if we're on login/register pages - skip auth check to prevent auto-login
+      // Check if we're on login/register pages - skip auth check
       const isAuthPage = window.location.pathname.includes('/login') || 
                         window.location.pathname.includes('/register');
       
@@ -20,18 +20,14 @@ export const useAuth = () => {
       try {
         const response = await api.get('/api/user');
         
-        // Validate response has required user data
         if (response.data && response.data.email && response.data.role) {
           setUser(response.data);
         } else {
           setUser(null);
         }
       } catch (error) {
+        // Only clear user state, don't clear storage immediately
         setUser(null);
-        
-        // Clear any stale storage
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
       } finally {
         setLoading(false);
       }
@@ -51,10 +47,13 @@ export const useAuth = () => {
         remember: credentials.remember || false
       });
       
-      const { user } = response.data;
-      setUser(user);
-      
-      return { success: true, user };
+      if (response.data.success && response.data.user) {
+        const { user } = response.data;
+        setUser(user);
+        return { success: true, user };
+      } else {
+        return { success: false, message: response.data.message || 'Login failed' };
+      }
     } catch (error) {
       return { 
         success: false, 

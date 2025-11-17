@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Film, Users, Calendar, Home, LogOut, ArrowLeft, MonitorCog, User, DoorOpen, Menu, X } from 'lucide-react';
+import { Film, Users, Calendar, Home, LogOut, ArrowLeft, MonitorCog, User, DoorOpen, Menu, X, Percent, BarChart3 } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import api from '../../utils/api';
 
@@ -13,6 +13,7 @@ const AdminSidebar = ({ activeMenu, onMenuChange }) => {
         { id: 'movies', label: 'Manage Movies', icon: Film },
         { id: 'users', label: 'Manage Users', icon: Users },
         { id: 'schedules', label: 'Manage Schedule', icon: Calendar },
+        { id: 'discounts', label: 'Manage Discounts', icon: Percent },
     ];
 
     const handleMenuClick = (menuId) => {
@@ -39,7 +40,7 @@ const AdminSidebar = ({ activeMenu, onMenuChange }) => {
             )}
 
             {/* Sidebar */}
-            <div className={`w-64 bg-white shadow-lg h-screen fixed left-0 top-0 z-40 flex flex-col transform transition-transform duration-300 ease-in-out ${
+            <div className={`w-64 bg-gradient-to-br from-white to-[#C6E7FF] shadow-lg h-screen fixed left-0 top-0 z-40 flex flex-col transform transition-transform duration-300 ease-in-out ${
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
             }`}>
                 {/* Header */}

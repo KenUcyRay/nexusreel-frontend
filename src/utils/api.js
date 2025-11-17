@@ -11,7 +11,7 @@ const api = axios.create({
         'X-Requested-With': 'XMLHttpRequest'
     },
     withCredentials: true,
-    timeout: 10000
+    timeout: 30000
 });
 
 // Request interceptor for debugging
@@ -29,12 +29,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         console.error('API Error:', error);
-        if (error.response?.status === 401) {
-            // Only redirect if not already on login page
-            if (!window.location.pathname.includes('/login')) {
-                window.location.href = '/login';
-            }
-        }
+        // Don't auto-redirect on 401, let components handle it
         return Promise.reject(error);
     }
 );

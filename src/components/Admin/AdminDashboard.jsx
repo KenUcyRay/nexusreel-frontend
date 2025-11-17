@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, Calendar, TrendingUp, Film, MapPin, Clock } from 'lucide-react';
+import { DollarSign, Calendar, TrendingUp, Film, MapPin, Clock, Percent, Gift, BarChart3 } from 'lucide-react';
 import api from '../../utils/api';
 
 export default function AdminDashboard() {
@@ -13,7 +13,13 @@ export default function AdminDashboard() {
     totalStudios: 0,
     totalMovies: 0,
     totalSchedules: 0,
-    recentTransactions: []
+    recentTransactions: [],
+    discountStats: {
+      totalDiscounts: 0,
+      activeDiscounts: 0,
+      totalDiscountUsage: 0,
+      totalDiscountAmount: 0
+    }
   });
   const [loading, setLoading] = useState(true);
 
@@ -23,8 +29,20 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await api.get('/api/dashboard/admin');
-      setData(response.data);
+      const [dashboardResponse, discountResponse] = await Promise.all([
+        api.get('/api/dashboard/admin'),
+        api.get('/api/admin/discount-summary').catch(() => ({ data: { totalDiscounts: 0, activeDiscounts: 0, totalUsage: 0, totalDiscountAmount: 0 } }))
+      ]);
+      
+      setData({
+        ...dashboardResponse.data,
+        discountStats: {
+          totalDiscounts: discountResponse.data.totalDiscounts || 0,
+          activeDiscounts: discountResponse.data.activeDiscounts || 0,
+          totalDiscountUsage: discountResponse.data.totalUsage || 0,
+          totalDiscountAmount: discountResponse.data.totalDiscountAmount || 0
+        }
+      });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -34,14 +52,14 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF] flex items-center justify-center">
         <div className="text-gray-500">Loading dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF] p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Admin Dashboard</h1>
         
@@ -111,6 +129,49 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Discount Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <Percent className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Discounts</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.discountStats.totalDiscounts}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <Gift className="w-8 h-8 sm:w-10 sm:h-10 text-green-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Active Discounts</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.discountStats.activeDiscounts}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Usage</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{data.discountStats.totalDiscountUsage}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <div className="flex items-center">
+              <DollarSign className="w-8 h-8 sm:w-10 sm:h-10 text-red-500 mr-2 sm:mr-4" />
+              <div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">Discount Given</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">Rp {data.discountStats.totalDiscountAmount.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
@@ -145,11 +206,11 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Transactions Table */}
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+        <div className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-xl p-4 sm:p-6 border border-white/20">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Transactions</h3>
           
           {data.recentTransactions.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-4 sm:-mx-6">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>

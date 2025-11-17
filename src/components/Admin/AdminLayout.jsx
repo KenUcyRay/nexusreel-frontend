@@ -6,6 +6,7 @@ import UserManagement from './UserManagement';
 import ProfileAdmin from './ProfileAdmin';
 import StudioManagement from './StudioManagement';
 import ScheduleManagement from './ScheduleManagement';
+import DiscountManagement from './DiscountManagement';
 
 const AdminLayout = () => {
     const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -22,6 +23,8 @@ const AdminLayout = () => {
                 return <UserManagement />;
             case 'schedules':
                 return <ScheduleManagement />;
+            case 'discounts':
+                return <DiscountManagement />;
             case 'bookings':
                 return (
                     <div className="p-4 sm:p-8">
@@ -37,7 +40,7 @@ const AdminLayout = () => {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
             <AdminSidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
             <div className="flex-1 lg:ml-64">
                 <div className="pt-16 lg:pt-0">

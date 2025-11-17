@@ -14,6 +14,7 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
   const [studio, setStudio] = useState(null);
   const [ticketCount, setTicketCount] = useState(1);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [bookedSeats, setBookedSeats] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [processing, setProcessing] = useState(false);
@@ -24,6 +25,29 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
   useEffect(() => {
     fetchScheduleDetails();
   }, [scheduleId]);
+  
+  // Refresh booked seats every 30 seconds to show real-time updates
+  useEffect(() => {
+    if (!schedule) return;
+    
+    const interval = setInterval(() => {
+      fetchBookedSeats();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [schedule]);
+  
+  const fetchBookedSeats = async () => {
+    try {
+      const response = await api.get(`/api/schedules/${scheduleId}/booked-seats`);
+      if (response.data.success) {
+        setBookedSeats(response.data.booked_seats || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch booked seats:', error);
+      setBookedSeats([]);
+    }
+  };
 
   const fetchScheduleDetails = async () => {
     try {
@@ -42,6 +66,9 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
       console.log('Schedule data:', scheduleData);
       setSchedule(scheduleData);
       setStudio(scheduleData.studio);
+      
+      // Fetch booked seats after schedule is loaded
+      await fetchBookedSeats();
     } catch (error) {
       console.error('Failed to fetch schedule:', error);
       navigate('/movies');
@@ -49,8 +76,15 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
       setLoading(false);
     }
   };
+  
+
 
   const handleSeatClick = (seatNumber) => {
+    // Prevent selecting booked seats
+    if (bookedSeats.includes(seatNumber)) {
+      return;
+    }
+    
     if (selectedSeats.includes(seatNumber)) {
       setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
     } else if (selectedSeats.length < ticketCount) {
@@ -193,7 +227,7 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
                   customer_name: customerName,
                   seats: selectedSeats,
                   total_amount: getTotalPrice(),
-                  movie_name: schedule?.movie?.title || schedule?.movie?.name,
+                  movie_name: schedule?.movie?.name || schedule?.movie?.title,
                   studio_name: studio?.name || schedule?.studio?.name,
                   show_date: schedule?.show_date,
                   show_time: schedule?.show_time,
@@ -318,7 +352,7 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
                   
                   {/* Movie Info */}
                   <div className="border-b pb-4 sm:pb-6 mb-4 sm:mb-6">
-                    <h3 className="text-base sm:text-lg font-semibold mb-2">{schedule?.movie?.title || schedule?.movie?.name}</h3>
+                    <h3 className="text-base sm:text-lg font-semibold mb-2">{schedule?.movie?.name || schedule?.movie?.title}</h3>
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm sm:text-base text-gray-600">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
@@ -377,19 +411,27 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
                   {/* Seats Grid */}
                   <div className="overflow-x-auto mb-4 sm:mb-6">
                     <div className={`grid gap-1 min-w-max mx-auto`} style={{gridTemplateColumns: `repeat(${studio?.columns || 20}, minmax(0, 1fr))`}}>
-                      {generateSeats().map((seat) => (
-                        <button
-                          key={seat}
-                          onClick={() => handleSeatClick(seat)}
-                          className={`w-7 h-7 sm:w-6 sm:h-6 rounded text-xs font-semibold transition-colors touch-manipulation ${
-                            selectedSeats.includes(seat)
-                              ? 'bg-[#FFA500] text-white'
-                              : 'bg-gray-200 hover:bg-gray-300 text-gray-700 active:bg-gray-400'
-                          }`}
-                        >
-                          {seat}
-                        </button>
-                      ))}
+                      {generateSeats().map((seat) => {
+                        const isBooked = bookedSeats.includes(seat);
+                        const isSelected = selectedSeats.includes(seat);
+                        
+                        return (
+                          <button
+                            key={seat}
+                            onClick={() => handleSeatClick(seat)}
+                            disabled={isBooked}
+                            className={`w-7 h-7 sm:w-6 sm:h-6 rounded text-xs font-semibold transition-colors touch-manipulation ${
+                              isBooked
+                                ? 'bg-red-500 text-white cursor-not-allowed'
+                                : isSelected
+                                ? 'bg-[#FFA500] text-white'
+                                : 'bg-gray-200 hover:bg-gray-300 text-gray-700 active:bg-gray-400'
+                            }`}
+                          >
+                            {seat}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -402,6 +444,10 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
                     <div className="flex items-center">
                       <div className="w-4 h-4 bg-[#FFA500] rounded mr-1 sm:mr-2"></div>
                       Selected
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 bg-red-500 rounded mr-1 sm:mr-2"></div>
+                      Booked
                     </div>
                   </div>
 
@@ -515,7 +561,7 @@ export default function BookingFlow({ isCashier = false, onSuccess, onCancel }) 
                     <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                       <div>
                         <p className="text-xs sm:text-sm text-gray-600">Movie</p>
-                        <p className="font-semibold text-sm sm:text-base">{schedule.movie?.title || schedule.movie?.name}</p>
+                        <p className="font-semibold text-sm sm:text-base">{schedule.movie?.name || schedule.movie?.title}</p>
                       </div>
                       <div className="grid grid-cols-2 gap-2 sm:gap-0 sm:block sm:space-y-3">
                         <div>

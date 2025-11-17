@@ -42,16 +42,16 @@ export default function Movies() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
       <Navbar />
       
-      <div className="pt-32 sm:pt-40 pb-12 sm:pb-16">
+      <div className="pt-48 sm:pt-56 pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-800 mb-6 sm:mb-8">Movies</h1>
           
           {/* Tabs */}
           <div className="flex justify-center mb-8 sm:mb-12">
-            <div className="bg-white rounded-lg p-1 shadow-md w-full max-w-md">
+            <div className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-lg p-1 shadow-md w-full max-w-md">
               <button
                 onClick={() => setActiveTab('nowPlaying')}
                 className={`w-1/2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-md font-semibold transition-colors text-sm sm:text-base ${
@@ -85,7 +85,7 @@ export default function Movies() {
               {(activeTab === 'nowPlaying' ? nowPlayingMovies : comingSoonMovies).map((movie) => (
                 <div 
                   key={movie.id} 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                   onClick={() => navigate(`/movies/${movie.id}`)}
                 >
                   <div className="relative">

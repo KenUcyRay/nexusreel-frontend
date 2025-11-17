@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Calendar, Clock, MapPin, Ticket, Eye } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Calendar, Clock, MapPin, Ticket, Eye, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import Navbar from '../ui/MainNavbar';
 import api from '../../utils/api';
@@ -9,15 +10,7 @@ export default function History() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [activeFilter, setActiveFilter] = useState('all');
-
-  const filteredTransactions = useMemo(() => {
-    if (!Array.isArray(transactions)) return [];
-    return transactions.filter(t => 
-      activeFilter === 'all' || 
-      (activeFilter === 'movie' && t.type === 'movie')
-    );
-  }, [transactions, activeFilter]);
+  // Removed filter - only show movie transactions
 
   const fetchTransactions = useCallback(async () => {
     if (!user || !user.email) {
@@ -85,7 +78,7 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
         <Navbar />
         <div className="pt-32 flex justify-center items-center h-64">
           <div className="text-gray-500">Loading transaction history...</div>
@@ -95,28 +88,14 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
       <Navbar />
       
       <div className="pt-32 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Transaction History</h1>
           
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-8 max-w-md mx-auto">
-            {['all', 'movie'].map(filter => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  activeFilter === filter
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {filter === 'all' ? 'All' : 'Tickets'}
-              </button>
-            ))}
-          </div>
+
           
           {transactions.length === 0 ? (
             <div className="text-center py-12">
@@ -126,8 +105,8 @@ export default function History() {
             </div>
           ) : (
             <div className="grid gap-6">
-              {filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              {transactions.map((transaction) => (
+                <div key={transaction.id} className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div className="flex items-start space-x-4 mb-4 md:mb-0">
                       {/* Movie Poster */}
@@ -173,6 +152,13 @@ export default function History() {
                           <span className="font-semibold">{transaction.ticketCount} ticket(s)</span>
                         </div>
                         
+                        {transaction.discount_amount && (
+                          <div className="mt-2">
+                            <span className="text-sm text-green-600">Discount: </span>
+                            <span className="font-semibold text-green-700">-Rp {parseInt(transaction.discount_amount).toLocaleString('id-ID')}</span>
+                          </div>
+                        )}
+                        
                         <div className="mt-2">
                           <span className="text-sm text-gray-600">Ticket ID: </span>
                           <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{transaction.ticketId}</span>
@@ -210,8 +196,8 @@ export default function History() {
       </div>
 
       {selectedTransaction && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-sm bg-gradient-to-br from-white/30 to-[#C6E7FF]/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-white to-[#C6E7FF] rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Transaction Details</h2>
@@ -251,6 +237,67 @@ export default function History() {
                   <h4 className="font-semibold text-gray-900">Ticket ID</h4>
                   <p className="font-mono text-sm bg-gray-100 p-2 rounded">{selectedTransaction.ticketId}</p>
                 </div>
+                
+                {selectedTransaction.discount_amount && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <h4 className="font-semibold text-green-800 mb-2">Discount Applied</h4>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-green-700">You Saved</span>
+                      <span className="font-bold text-green-800">Rp {parseInt(selectedTransaction.discount_amount).toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* QR Code Section */}
+                {selectedTransaction.status === 'completed' && (
+                  <div className="border-t pt-4 mb-4">
+                    <h4 className="font-semibold text-gray-900 mb-3">E-Ticket QR Code</h4>
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                      <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
+                        <QRCodeSVG 
+                          value={JSON.stringify({
+                            orderId: selectedTransaction.ticketId,
+                            movie: selectedTransaction.movie,
+                            date: selectedTransaction.date,
+                            time: selectedTransaction.time,
+                            seats: selectedTransaction.seats,
+                            studio: selectedTransaction.studio,
+                            amount: selectedTransaction.totalPrice
+                          })}
+                          size={120}
+                          level="M"
+                        />
+                      </div>
+                      <div className="text-center md:text-left">
+                        <p className="text-sm text-gray-600 mb-2">Show this QR code at the cinema entrance</p>
+                        <button 
+                          onClick={() => {
+                            const svg = document.querySelector('svg');
+                            const svgData = new XMLSerializer().serializeToString(svg);
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const img = new Image();
+                            img.onload = () => {
+                              canvas.width = img.width;
+                              canvas.height = img.height;
+                              ctx.drawImage(img, 0, 0);
+                              const url = canvas.toDataURL('image/png');
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `ticket-${selectedTransaction.ticketId}.png`;
+                              a.click();
+                            };
+                            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+                          }}
+                          className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Download QR Code
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center mb-4">

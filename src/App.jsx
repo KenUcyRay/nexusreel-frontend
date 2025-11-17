@@ -22,6 +22,8 @@ import CashierBooking from "./components/Cashier/CashierBooking"
 import CashierBookingFlow from "./components/Cashier/CashierBookingFlow"
 import CashierHistory from "./components/Cashier/CashierHistory"
 import CashierSuccess from "./components/Cashier/CashierSuccess"
+import QRScanner from "./components/Cashier/QRScanner"
+import PrintTicket from "./components/Cashier/PrintTicket"
 import DetailMovies from "./components/Pages/Detail/DetailMovies"
 import Unauthorized from "./components/Pages/Unauthorized"
 import NotFound from "./components/Pages/NotFound"
@@ -111,6 +113,16 @@ function AppContent() {
           <Route path="/kasir/success" element={
             <ProtectedRoute roles={['kasir']}>
               <CashierSuccess />
+            </ProtectedRoute>
+          } />
+          <Route path="/kasir/scan-qr" element={
+            <ProtectedRoute roles={['kasir']}>
+              <QRScanner />
+            </ProtectedRoute>
+          } />
+          <Route path="/kasir/print-ticket" element={
+            <ProtectedRoute roles={['kasir']}>
+              <PrintTicket />
             </ProtectedRoute>
           } />
           <Route path="/unauthorized" element={<Unauthorized />} />

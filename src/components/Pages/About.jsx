@@ -14,24 +14,23 @@ export default function About() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#C6E7FF]">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative h-80 sm:h-96 bg-gradient-to-r from-gray-900 to-gray-700 pt-28 sm:pt-40">
-        <div className="absolute inset-0 bg-black/30" />
+      <section className="relative h-80 sm:h-96 bg-gradient-to-r from-white to-[#C6E7FF] pt-48 sm:pt-56">
         <div className="relative h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-white text-center" data-aos="fade-up">
+            <div className="text-gray-600 text-center" data-aos="fade-up">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">About Nexus Cinema</h1>
-              <p className="text-lg sm:text-xl text-gray-300">Your Ultimate Movie Experience</p>
+              <p className="text-lg sm:text-xl text-gray-600">Your Ultimate Movie Experience</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* About Content */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-16" data-aos="fade-up">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4 sm:mb-6">Who We Are</h2>
@@ -44,7 +43,7 @@ export default function About() {
       </section>
 
       {/* Mission & Vision */}
-     <section className="py-12 sm:py-16 bg-gray-50">
+     <section className="py-12 sm:py-16">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
       <div data-aos="fade-right">
@@ -76,7 +75,7 @@ export default function About() {
 
 
       {/* Contact Info */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-8 sm:mb-12" data-aos="fade-up">Get In Touch</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
